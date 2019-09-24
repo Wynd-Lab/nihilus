@@ -1,0 +1,29 @@
+{
+    "name": "spontoreau/nihilus",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sylvain Pontoreau",
+            "email": "pontoreau.sylvain@gmail.com"
+        }
+    ],
+    "description": "CQRS",
+    "scripts": {
+        "test": "vendor/bin/phpunit tests --bootstrap vendor/autoload.php",
+        "test:watch": "vendor/bin/phpunit-watcher watch tests/*",
+        "format": "vendor/bin/php-cs-fixer fix src",
+        "lint": "vendor/bin/phpmd src text codesize,cleancode,design,naming,controversial,unusedcode"
+    },
+    "autoload": {
+        "classmap": ["src"]
+    },
+    "require": {
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.5",
+        "friendsofphp/php-cs-fixer": "^2.15",
+        "spatie/phpunit-watcher": "^1.10",
+        "phpmd/phpmd": "^2.7"
+    }
+}
