@@ -8,14 +8,14 @@ class HandlerRegistry
 
     public static function add(string $queryName, string $handlerName)
     {
-        HandlerRegistry::$array[$queryName] = $handlerName;
+        self::$array[$queryName] = $handlerName;
     }
 
     public static function get(string $queryName)
     {
-        $exists = array_key_exists($queryName, HandlerRegistry::$array);
+        $exists = array_key_exists($queryName, self::$array);
 
-        foreach(HandlerRegistry::$array as $key=>$value)
+        foreach(self::$array as $key=>$value)
         {
             if($key === $queryName) 
             {
