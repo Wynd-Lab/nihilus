@@ -1,10 +1,10 @@
 <?php
 
-namespace Sypontor\Nihilus;
+namespace Nihilus\Handling;
 
-use Sypontor\Nihilus\CommandInterface;
+use Nihilus\Handling\QueryInterface;
 
 interface HandlerInterface
 {
-    public function handle(CommandInterface $command);
+    function handle(QueryInterface $command);
 }

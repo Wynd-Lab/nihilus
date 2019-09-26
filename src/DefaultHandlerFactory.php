@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Sypontor\Nihilus;
+namespace Nihilus\Handling;
 
 final class DefaultHandlerFactory
 {
-    public function create(string $class)
+    public function create(string $handlerClass)
     {
-        $reflectionClass = new \ReflectionClass($class);
+        $reflectionClass = new \ReflectionClass($handlerClass);
         return $reflectionClass->newInstance();
     }
 }
