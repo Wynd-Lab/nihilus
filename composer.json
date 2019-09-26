@@ -16,7 +16,7 @@
         "lint": "vendor/bin/phpmd src text codesize,cleancode,design,naming,controversial,unusedcode"
     },
     "autoload": {
-        "classmap": ["src"]
+        "classmap": ["src", "tests"]
     },
     "require": {
     },
