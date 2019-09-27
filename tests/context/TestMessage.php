@@ -8,13 +8,13 @@ class TestMessage implements QueryInterface
 {
     private $prop;
 
-    function __construct(string $value)
+    public function __construct(string $value)
     {
-        $this->$prop = $value;
+        $this->{prop} = $value;
     }
 
     public function getProp(): string
     {
-        return $this->$prop;
+        return $this->{prop};
     }
 }

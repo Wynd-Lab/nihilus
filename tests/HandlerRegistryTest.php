@@ -1,18 +1,20 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
-use Nihilus\Handling\HandlerInterface;
-use Nihilus\Handling\QueryInterface;
 use Nihilus\Handling\HandlerRegistry;
 use Nihilus\Tests\Context\TestHandler;
 use Nihilus\Tests\Context\TestMessage;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 class HandlerRegistryTest extends TestCase
 {
     /**
      * @test
      */
-    function shouldReturnHandlerClass_whenCallGetMethodWithAQueryClass()
+    public function shouldReturnHandlerClassWhenCallGetMethodWithAQueryClass()
     {
         // Arrange
         $messageClass = TestMessage::class;

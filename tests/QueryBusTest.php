@@ -1,20 +1,24 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
 use Nihilus\Handling\HandlerRegistry;
 use Nihilus\Handling\QueryBus;
 use Nihilus\Tests\Context\TestHandler;
 use Nihilus\Tests\Context\TestMessage;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * @internal
+ * @coversNothing
+ */
 final class QueryBusTest extends TestCase
 {
     /**
      * @test
      */
-    public function shouldHandleQuery_whenExecuteAQuery()
+    public function shouldHandleQueryWhenExecuteAQuery()
     {
         // Arrange
-        $expected = "test";
+        $expected = 'test';
         HandlerRegistry::add(TestCommand::class, TestHandler::class);
         $queryBus = new QueryBus();
 
@@ -27,6 +31,5 @@ final class QueryBusTest extends TestCase
 
     public function shouldThrow_whenHandlerIsNotFound()
     {
-        
     }
 }

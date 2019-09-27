@@ -2,9 +2,7 @@
 
 namespace Nihilus\Handling;
 
-use Nihilus\Handling\QueryInterface;
-
 interface HandlerInterface
 {
-    function handle(QueryInterface $command);
+    public function handle(QueryInterface $command);
 }

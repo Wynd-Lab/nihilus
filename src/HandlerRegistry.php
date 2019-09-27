@@ -4,7 +4,7 @@ namespace Nihilus\Handling;
 
 class HandlerRegistry
 {
-    private static $array = array();
+    private static $array = [];
 
     public static function add(string $queryName, string $handlerName)
     {
@@ -15,10 +15,8 @@ class HandlerRegistry
     {
         $exists = array_key_exists($queryName, self::$array);
 
-        foreach(self::$array as $key=>$value)
-        {
-            if($key === $queryName) 
-            {
+        foreach (self::$array as $key => $value) {
+            if ($key === $queryName) {
                 return $value;
             }
         }

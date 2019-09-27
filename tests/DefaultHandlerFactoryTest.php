@@ -1,19 +1,22 @@
 <?php
+
 xdebug_disable();
 
-use PHPUnit\Framework\TestCase;
 use Nihilus\Handling\DefaultHandlerFactory;
 use Nihilus\Handling\HandlerInterface;
-use Nihilus\Handling\QueryInterface;
 use Nihilus\Tests\Context\TestHandler;
-use Nihilus\Tests\Context\TestMessage;
+use PHPUnit\Framework\TestCase;
 
-final class HandlerFactoryTest extends TestCase 
+/**
+ * @internal
+ * @coversNothing
+ */
+final class HandlerFactoryTest extends TestCase
 {
     /**
      * @test
      */
-    public function shouldReturnNewQueryHandler_whenCreateAHandlerWithAQuery()
+    public function shouldReturnNewQueryHandlerWhenCreateAHandlerWithAQuery()
     {
         // Arrange
         $handlerFactory = new DefaultHandlerFactory();

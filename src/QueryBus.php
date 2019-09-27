@@ -2,15 +2,14 @@
 
 namespace Nihilus\Handling;
 
-use Nihilus\Handling\QueryInterface;
-use Nihilus\Handling\QueryBusInterface;
-use Nihilus\Handling\DefaultHandlerFactory;
-
 class QueryBus implements QueryBusInterface
 {
+    /**
+     * @var DefaultHandlerFactory
+     */
     private $factory;
 
-    function __construct() 
+    public function __construct()
     {
         $this->factory = new DefaultHandlerFactory();
     }
@@ -19,6 +18,7 @@ class QueryBus implements QueryBusInterface
     {
         $class = HandlerRegistry::get(get_class($query));
         $handler = $this->factory->create($class);
+
         return $handler->handle($query);
-    } 
+    }
 }
