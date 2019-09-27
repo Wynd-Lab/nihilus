@@ -13,8 +13,6 @@ class HandlerRegistry
 
     public static function get(string $queryName)
     {
-        $exists = array_key_exists($queryName, self::$array);
-
         foreach (self::$array as $key => $value) {
             if ($key === $queryName) {
                 return $value;

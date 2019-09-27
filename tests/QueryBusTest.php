@@ -1,5 +1,6 @@
 <?php
 
+use Nihilus\Handling\Exceptions\UnknowQueryException;
 use Nihilus\Handling\HandlerRegistry;
 use Nihilus\Handling\QueryBus;
 use Nihilus\Tests\Context\TestHandler;
@@ -12,6 +13,14 @@ use PHPUnit\Framework\TestCase;
  */
 final class QueryBusTest extends TestCase
 {
+    protected function tearDown()
+    {
+        $property = new ReflectionProperty(HandlerRegistry::class, 'array');
+        $property->setAccessible(true);
+        $property->setValue(null, []);
+        $property->setAccessible(false);
+    }
+
     /**
      * @test
      */
@@ -29,7 +38,16 @@ final class QueryBusTest extends TestCase
         $this->assertEquals($actual, $expected);
     }
 
-    public function shouldThrow_whenHandlerIsNotFound()
+    /**
+     * @test
+     */
+    public function shouldThrowWhenHandlerIsNotFound()
     {
+        // Arrange
+        $this->expectException(UnknowQueryException::class);
+
+        // Act
+        $queryBus = new QueryBus();
+        $queryBus->execute(new TestMessage(''));
     }
 }
