@@ -12,13 +12,13 @@ class QueryBus implements QueryBusInterface
 
     function __construct() 
     {
-        $this->$factory = new DefaultHandlerFactory();
+        $this->factory = new DefaultHandlerFactory();
     }
 
-    public function execute(QueryInterface $command)
+    public function execute(QueryInterface $query)
     {
-        $handlerClass = HandlerRegistry::get(get_class($command));
-        $handler = $this->$factory->create($handlerClass);
-        return $handler->handle($command);
+        $class = HandlerRegistry::get(get_class($query));
+        $handler = $this->factory->create($class);
+        return $handler->handle($query);
     } 
 }

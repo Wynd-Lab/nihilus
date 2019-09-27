@@ -2,9 +2,9 @@
 
 namespace Nihilus\Handling;
 
-use Nihilus\Handling\QueryBusInterface;
+use Nihilus\Handling\QueryInterface;
 
 interface QueryBusInterface
 {
-    function execute(QueryInterface $command);
+    function execute(QueryInterface $query);
 }

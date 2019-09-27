@@ -2,8 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 use Nihilus\Handling\HandlerRegistry;
-use Nihilus\Handling\HandlerInterface;
-use Nihilus\Handling\QueryInterface;
 use Nihilus\Handling\QueryBus;
 use Nihilus\Tests\Context\TestHandler;
 use Nihilus\Tests\Context\TestMessage;
@@ -25,5 +23,10 @@ final class QueryBusTest extends TestCase
 
         // Assert
         $this->assertEquals($actual, $expected);
+    }
+
+    public function shouldThrow_whenHandlerIsNotFound()
+    {
+        
     }
 }
