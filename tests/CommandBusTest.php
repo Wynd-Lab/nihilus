@@ -4,6 +4,7 @@ use Nihilus\Handling\CommandBus;
 use Nihilus\Handling\CommandHandlerInterface;
 use Nihilus\Handling\CommandHandlerResolverInterface;
 use Nihilus\Handling\CommandInterface;
+use Nihilus\Handling\Exceptions\UnknowCommandException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,12 +40,6 @@ final class CommandBusTest extends TestCase
             ->setMethods((['get']))
             ->getMock()
         ;
-
-        $this->commandHandlerResolver
-            ->method('get')
-            ->with($this->command)
-            ->willReturn($this->handler)
-        ;
     }
 
     /**
@@ -59,13 +54,46 @@ final class CommandBusTest extends TestCase
             ->with($this->command)
         ;
 
+        $this->commandHandlerResolver
+            ->method('get')
+            ->with($this->command)
+            ->willReturn($this->handler)
+        ;
+
         $commandBus = new CommandBus($this->commandHandlerResolver);
 
         // Act
         $commandBus->execute($this->command);
     }
+
+    /**
+     * @test
+     */
+    public function shouldThrowWhenHandlerIsNotFound()
+    {
+        // Arrange
+        $command = new UnknowTestCommand();
+
+        $this->commandHandlerResolver
+            ->method('get')
+            ->with($command)
+            ->willReturn(null)
+        ;
+
+        $this->expectException(UnknowCommandException::class);
+
+        // Act
+        $commandBus = new CommandBus($this->commandHandlerResolver);
+
+        // Act
+        $commandBus->execute(new UnknowTestCommand());
+    }
 }
 
 class TestCommand implements CommandInterface
+{
+}
+
+class UnknowTestCommand implements CommandInterface
 {
 }

@@ -2,6 +2,8 @@
 
 namespace Nihilus\Handling;
 
+use Nihilus\Handling\Exceptions\UnknowCommandException;
+
 class CommandBus implements CommandBusInteface
 {
     /**
@@ -17,6 +19,11 @@ class CommandBus implements CommandBusInteface
     public function execute(CommandInterface $command): void
     {
         $handler = $this->commandHandlerResolver->get($command);
+
+        if (null === $handler) {
+            throw new UnknowCommandException($command);
+        }
+
         $handler->handle($command);
     }
 }
