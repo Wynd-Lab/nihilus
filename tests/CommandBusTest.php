@@ -86,7 +86,7 @@ final class CommandBusTest extends TestCase
         $commandBus = new CommandBus($this->commandHandlerResolver);
 
         // Act
-        $commandBus->execute(new UnknowTestCommand());
+        $commandBus->execute($command);
     }
 }
 
