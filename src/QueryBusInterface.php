@@ -4,5 +4,5 @@ namespace Nihilus\Handling;
 
 interface QueryBusInterface
 {
-    public function execute(QueryInterface $query);
+    public function execute(QueryInterface $query): object;
 }

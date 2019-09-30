@@ -1,10 +1,11 @@
 <?php
 
 use Nihilus\Handling\Exceptions\UnknowQueryException;
-use Nihilus\Handling\HandlerRegistry;
 use Nihilus\Handling\QueryBus;
-use Nihilus\Tests\Context\TestHandler;
-use Nihilus\Tests\Context\TestMessage;
+use Nihilus\Tests\Context\TestQuery;
+use Nihilus\Tests\Context\TestQueryHandler;
+use Nihilus\Tests\Context\TestQueryHandlerResolver;
+use Nihilus\Tests\Context\TestQueryReadModel;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,26 +14,21 @@ use PHPUnit\Framework\TestCase;
  */
 final class QueryBusTest extends TestCase
 {
-    protected function tearDown()
-    {
-        $property = new ReflectionProperty(HandlerRegistry::class, 'array');
-        $property->setAccessible(true);
-        $property->setValue(null, []);
-        $property->setAccessible(false);
-    }
-
     /**
      * @test
      */
     public function shouldHandleQueryWhenExecuteAQuery()
     {
         // Arrange
-        $expected = 'test';
-        HandlerRegistry::add(TestCommand::class, TestHandler::class);
-        $queryBus = new QueryBus();
+        $value = 'test';
+        $expected = new TestQueryReadModel($value);
+
+        $handlerResolver = new TestQueryHandlerResolver();
+        $handlerResolver->add(TestQuery::class, TestQueryHandler::class);
+        $queryBus = new QueryBus($handlerResolver);
 
         // Act
-        $actual = $queryBus->execute(new TestMessage($expected));
+        $actual = $queryBus->execute(new TestQuery($value));
 
         // Assert
         $this->assertEquals($actual, $expected);
@@ -47,7 +43,7 @@ final class QueryBusTest extends TestCase
         $this->expectException(UnknowQueryException::class);
 
         // Act
-        $queryBus = new QueryBus();
-        $queryBus->execute(new TestMessage(''));
+        $queryBus = new QueryBus(new TestQueryHandlerResolver());
+        $queryBus->execute(new TestQuery(''));
     }
 }

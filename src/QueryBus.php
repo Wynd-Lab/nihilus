@@ -7,24 +7,22 @@ use Nihilus\Handling\Exceptions\UnknowQueryException;
 class QueryBus implements QueryBusInterface
 {
     /**
-     * @var DefaultHandlerFactory
+     * @var QueryHandlerResolverInterface
      */
-    private $factory;
+    private $queryHandlerResolver;
 
-    public function __construct()
+    public function __construct(QueryHandlerResolverInterface $queryHandlerResovler)
     {
-        $this->factory = new DefaultHandlerFactory();
+        $this->queryHandlerResolver = $queryHandlerResovler;
     }
 
-    public function execute(QueryInterface $query)
+    public function execute(QueryInterface $query): object
     {
-        $class = HandlerRegistry::get(get_class($query));
+        $handler = $this->queryHandlerResolver->get($query);
 
-        if (null === $class) {
+        if (null === $handler) {
             throw new UnknowQueryException($query);
         }
-
-        $handler = $this->factory->create($class);
 
         return $handler->handle($query);
     }
