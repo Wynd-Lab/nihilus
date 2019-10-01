@@ -56,12 +56,33 @@ final class QueryBusTest extends TestCase
         // Arrange
         $expected = new TestQueryReadModel($this->uid);
 
+        $this->queryHandlerResolver
+            ->method('get')
+            ->with($this->query)
+            ->willReturn($this->handler)
+        ;
+
         $this->handler
-            ->expects($this->once())
             ->method('handle')
             ->with($this->query)
             ->willReturn($expected)
         ;
+
+        $queryBus = new QueryBus($this->queryHandlerResolver);
+
+        // Act
+        $actual = $queryBus->execute($this->query);
+
+        $this->assertEquals($actual, $expected);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldHandleQueryOnceWhenExecuteAQuery()
+    {
+        // Arrange
+        $expected = new TestQueryReadModel($this->uid);
 
         $this->queryHandlerResolver
             ->method('get')
@@ -71,11 +92,16 @@ final class QueryBusTest extends TestCase
 
         $queryBus = new QueryBus($this->queryHandlerResolver);
 
-        // Act
-        $actual = $queryBus->execute($this->query);
-
         // Assert
-        $this->assertEquals($actual, $expected);
+        $this->handler
+            ->expects($this->once())
+            ->method('handle')
+            ->with($this->query)
+            ->willReturn($expected)
+        ;
+
+        // Act
+        $queryBus->execute($this->query);
     }
 
     /**
@@ -92,6 +118,7 @@ final class QueryBusTest extends TestCase
             ->willReturn(null)
         ;
 
+        // Assert
         $this->expectException(UnknowQueryException::class);
 
         // Act

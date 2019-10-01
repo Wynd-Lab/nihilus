@@ -48,12 +48,6 @@ final class CommandBusTest extends TestCase
     public function shouldHandleCommandWhenExecuteAQuery()
     {
         // Arrange
-        $this->handler
-            ->expects($this->once())
-            ->method('handle')
-            ->with($this->command)
-        ;
-
         $this->commandHandlerResolver
             ->method('get')
             ->with($this->command)
@@ -61,6 +55,13 @@ final class CommandBusTest extends TestCase
         ;
 
         $commandBus = new CommandBus($this->commandHandlerResolver);
+
+        // Assert
+        $this->handler
+            ->expects($this->once())
+            ->method('handle')
+            ->with($this->command)
+        ;
 
         // Act
         $commandBus->execute($this->command);
@@ -80,10 +81,10 @@ final class CommandBusTest extends TestCase
             ->willReturn(null)
         ;
 
-        $this->expectException(UnknowCommandException::class);
-
-        // Act
         $commandBus = new CommandBus($this->commandHandlerResolver);
+
+        // Assert
+        $this->expectException(UnknowCommandException::class);
 
         // Act
         $commandBus->execute($command);
