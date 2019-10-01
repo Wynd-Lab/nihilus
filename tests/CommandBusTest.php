@@ -80,10 +80,10 @@ final class CommandBusTest extends TestCase
             ->willReturn(null)
         ;
 
-        $this->expectException(UnknowCommandException::class);
-
-        // Act
         $commandBus = new CommandBus($this->commandHandlerResolver);
+
+        // Assert
+        $this->expectException(UnknowCommandException::class);
 
         // Act
         $commandBus->execute($command);
