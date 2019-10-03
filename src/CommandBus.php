@@ -11,9 +11,15 @@ class CommandBus implements CommandBusInteface
      */
     private $commandHandlerResolver;
 
-    public function __construct(CommandHandlerResolverInterface $commandHandlerResolver)
+    /**
+     * @var PipelineResolverInterface
+     */
+    private $pipelineResolver;
+
+    public function __construct(CommandHandlerResolverInterface $commandHandlerResolver, PipelineResolverInterface $pipelineResolver)
     {
         $this->commandHandlerResolver = $commandHandlerResolver;
+        $this->pipelineResolver = $pipelineResolver;
     }
 
     public function execute(CommandInterface $command): void
@@ -24,6 +30,14 @@ class CommandBus implements CommandBusInteface
             throw new UnknowCommandException($command);
         }
 
-        $handler->handle($command);
+        $pipelines = $this->pipelineResolver->getGlobal();
+
+        $pipelineDispatcher = new PipelineDispatcher($handler);
+
+        foreach ($pipelines as $pipeline) {
+            $pipelineDispatcher->addPipeline($pipeline);
+        }
+
+        $pipelineDispatcher->handle($command);
     }
 }
