@@ -30,7 +30,7 @@ class CommandBus implements CommandBusInteface
             throw new UnknowCommandException($command);
         }
 
-        $pipelines = $this->pipelineResolver->getGlobal();
+        $pipelines = $this->pipelineResolver->getGlobalCommandPipelines();
 
         $pipelineDispatcher = new PipelineDispatcher($handler);
 

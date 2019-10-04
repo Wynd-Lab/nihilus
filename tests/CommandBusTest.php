@@ -4,8 +4,8 @@ use Nihilus\Handling\CommandBus;
 use Nihilus\Handling\CommandHandlerInterface;
 use Nihilus\Handling\CommandHandlerResolverInterface;
 use Nihilus\Handling\CommandInterface;
+use Nihilus\Handling\CommandPipelineInterface;
 use Nihilus\Handling\Exceptions\UnknowCommandException;
-use Nihilus\Handling\PipelineInterface;
 use Nihilus\Handling\PipelineResolverInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -16,21 +16,7 @@ use PHPUnit\Framework\TestCase;
 final class CommandBusTest extends TestCase
 {
     /**
-     * @var CommandHandlerResolverInterface
-     */
-    private $commandHandlerResolver;
-
-    private $commandHandlerResolverReturn;
-
-    /**
-     * @var PipelineResolverInterface
-     */
-    private $pipelineResolver;
-
-    private $pipelineResolverReturn;
-
-    /**
-     * @var TestCommand
+     * @var CommandInterface
      */
     private $command;
 
@@ -40,13 +26,36 @@ final class CommandBusTest extends TestCase
     private $handler;
 
     /**
-     * @var PipelineInterface
+     * @var CommandHandlerResolverInterface
+     */
+    private $commandHandlerResolver;
+
+    /**
+     * @var CommandHandlerInterface
+     */
+    private $commandHandlerResolverReturn;
+
+    /**
+     * @var PipelineResolverInterface
+     */
+    private $pipelineResolver;
+
+    /**
+     * @var CommandPipelineInterface[]
+     */
+    private $pipelineResolverReturn;
+
+    /**
+     * @var CommandPipelineInterface
      */
     private $pipeline;
 
     public function setUp()
     {
-        $this->command = new TestCommand();
+        $command = new class() implements CommandInterface {
+        };
+
+        $this->command = $command;
 
         $this->handler = $this
             ->getMockBuilder(CommandHandlerInterface::class)
@@ -72,19 +81,19 @@ final class CommandBusTest extends TestCase
         $this->commandHandlerResolverReturn = $this->handler;
 
         $this->pipeline = $this
-            ->getMockBuilder(PipelineInterface::class)
+            ->getMockBuilder(CommandPipelineInterface::class)
             ->setMethods(['handle'])
             ->getMock()
         ;
 
         $this->pipelineResolver = $this
             ->getMockBuilder(PipelineResolverInterface::class)
-            ->setMethods((['getGlobal']))
+            ->setMethods((['getGlobalCommandPipelines']))
             ->getMock()
         ;
 
         $this->pipelineResolver
-            ->method('getGlobal')
+            ->method('getGlobalCommandPipelines')
             ->will($this->returnCallback(
                 function () {
                     return $this->pipelineResolverReturn;
@@ -121,7 +130,8 @@ final class CommandBusTest extends TestCase
     {
         // Arrange
         $this->commandHandlerResolverReturn = null;
-        $command = new UnknowTestCommand();
+        $command = new class() implements CommandInterface {
+        };
 
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->pipelineResolver);
 
@@ -158,7 +168,7 @@ final class CommandBusTest extends TestCase
     public function shouldHandleCommandWhenPipelineDontBreakTheExecutionFlow()
     {
         // Arrange
-        $this->pipelineResolverReturn = [new class() implements PipelineInterface {
+        $this->pipelineResolverReturn = [new class() implements CommandPipelineInterface {
             public function handle(CommandInterface $command, CommandHandlerInterface $next): void
             {
                 $next->handle($command);
@@ -182,7 +192,7 @@ final class CommandBusTest extends TestCase
     public function shouldBreakTheExecutionFlowWhenPipelineDontHandleCommandWithTheNextPipeline()
     {
         // Arrange
-        $this->pipelineResolverReturn = [new class() implements PipelineInterface {
+        $this->pipelineResolverReturn = [new class() implements CommandPipelineInterface {
             public function handle(CommandInterface $command, CommandHandlerInterface $next): void
             {
             }
@@ -198,12 +208,4 @@ final class CommandBusTest extends TestCase
         // Act
         $commandBus->execute($this->command);
     }
-}
-
-class TestCommand implements CommandInterface
-{
-}
-
-class UnknowTestCommand implements CommandInterface
-{
 }
