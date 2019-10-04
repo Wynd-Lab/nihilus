@@ -5,7 +5,7 @@ namespace Nihilus\Handling;
 interface PipelineResolverInterface
 {
     /**
-     * @return PipelineInterface[]
+     * @return CommandPipelineInterface[]
      */
-    public function getGlobal(): array;
+    public function getGlobalCommandPipelines(): array;
 }

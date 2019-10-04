@@ -2,7 +2,7 @@
 
 namespace Nihilus\Handling;
 
-interface PipelineInterface
+interface CommandPipelineInterface
 {
     public function handle(CommandInterface $command, CommandHandlerInterface $next): void;
 }

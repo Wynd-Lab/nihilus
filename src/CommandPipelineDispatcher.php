@@ -17,14 +17,14 @@ class PipelineDispatcher
         $this->handler = $handler;
     }
 
-    public function addPipeline(PipelineInterface $pipeline): void
+    public function addPipeline(CommandPipelineInterface $pipeline): void
     {
         $next = $this->handler;
         $this->handler = new class($pipeline, $next) implements CommandHandlerInterface {
             private $pipeline;
             private $next;
 
-            public function __construct(PipelineInterface $pipeline, CommandHandlerInterface $next)
+            public function __construct(CommandPipelineInterface $pipeline, CommandHandlerInterface $next)
             {
                 $this->pipeline = $pipeline;
                 $this->next = $next;
