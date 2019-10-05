@@ -7,5 +7,5 @@ interface QueryPipelineResolverInterface
     /**
      * @return QueryPipelineInterface[]
      */
-    public function getGlobalQueryPipelines(): array;
+    public function getGlobals(): array;
 }

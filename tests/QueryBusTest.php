@@ -72,12 +72,12 @@ final class QueryBusTest extends TestCase
 
         $this->queryPipelineResolver = $this
             ->getMockBuilder(QueryPipelineResolverInterface::class)
-            ->setMethods((['getGlobalQueryPipelines']))
+            ->setMethods((['getGlobals']))
             ->getMock()
         ;
 
         $this->queryPipelineResolver
-            ->method('getGlobalQueryPipelines')
+            ->method('getGlobals')
             ->will($this->returnCallback(
                 function () {
                     return $this->queryPipelineResolverReturn;

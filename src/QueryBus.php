@@ -12,14 +12,14 @@ class QueryBus implements QueryBusInterface
     private $queryHandlerResolver;
 
     /**
-     * @var PipelineResolverInterface
+     * @var QueryPipelineResolverInterface
      */
-    private $pipelineResolver;
+    private $queryPipelineResolver;
 
     public function __construct(QueryHandlerResolverInterface $queryHandlerResovler, QueryPipelineResolverInterface $pipelineResolver)
     {
         $this->queryHandlerResolver = $queryHandlerResovler;
-        $this->pipelineResolver = $pipelineResolver;
+        $this->queryPipelineResolver = $pipelineResolver;
     }
 
     public function execute(QueryInterface $query): object
@@ -30,7 +30,7 @@ class QueryBus implements QueryBusInterface
             throw new UnknowQueryException($query);
         }
 
-        $pipelines = $this->pipelineResolver->getGlobalQueryPipelines();
+        $pipelines = $this->queryPipelineResolver->getGlobals();
 
         $pipelineDispatcher = new QueryPipelineDispatcher($handler);
 
