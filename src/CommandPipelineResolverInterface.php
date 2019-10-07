@@ -2,7 +2,7 @@
 
 namespace Nihilus\Handling;
 
-interface PipelineResolverInterface
+interface CommandPipelineResolverInterface
 {
     /**
      * @return CommandPipelineInterface[]

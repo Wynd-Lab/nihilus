@@ -5,8 +5,8 @@ use Nihilus\Handling\CommandHandlerInterface;
 use Nihilus\Handling\CommandHandlerResolverInterface;
 use Nihilus\Handling\CommandInterface;
 use Nihilus\Handling\CommandPipelineInterface;
+use Nihilus\Handling\CommandPipelineResolverInterface;
 use Nihilus\Handling\Exceptions\UnknowCommandException;
-use Nihilus\Handling\PipelineResolverInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -36,9 +36,9 @@ final class CommandBusTest extends TestCase
     private $commandHandlerResolverReturn;
 
     /**
-     * @var PipelineResolverInterface
+     * @var CommandPipelineResolverInterface
      */
-    private $pipelineResolver;
+    private $commandPipelineResolver;
 
     /**
      * @var CommandPipelineInterface[]
@@ -86,13 +86,13 @@ final class CommandBusTest extends TestCase
             ->getMock()
         ;
 
-        $this->pipelineResolver = $this
-            ->getMockBuilder(PipelineResolverInterface::class)
+        $this->commandPipelineResolver = $this
+            ->getMockBuilder(CommandPipelineResolverInterface::class)
             ->setMethods((['getGlobalCommandPipelines']))
             ->getMock()
         ;
 
-        $this->pipelineResolver
+        $this->commandPipelineResolver
             ->method('getGlobalCommandPipelines')
             ->will($this->returnCallback(
                 function () {
@@ -110,7 +110,7 @@ final class CommandBusTest extends TestCase
     public function shouldHandleCommandWhenExecuteACommand()
     {
         // Arrange
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->pipelineResolver);
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
 
         // Assert
         $this->handler
@@ -133,7 +133,7 @@ final class CommandBusTest extends TestCase
         $command = new class() implements CommandInterface {
         };
 
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->pipelineResolver);
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
 
         // Assert
         $this->expectException(UnknowCommandException::class);
@@ -149,7 +149,7 @@ final class CommandBusTest extends TestCase
     {
         // Arrange
         $this->pipelineResolverReturn = [$this->pipeline];
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->pipelineResolver);
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
 
         // Assert
         $this->pipeline
@@ -174,7 +174,7 @@ final class CommandBusTest extends TestCase
                 $next->handle($command);
             }
         }];
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->pipelineResolver);
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
 
         $this->handler
             ->expects($this->once())
@@ -197,7 +197,7 @@ final class CommandBusTest extends TestCase
             {
             }
         }];
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->pipelineResolver);
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
 
         $this->handler
             ->expects($this->never())
