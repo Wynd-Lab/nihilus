@@ -16,10 +16,10 @@ class CommandBus implements CommandBusInteface
      */
     private $commandPipelineResolver;
 
-    public function __construct(CommandHandlerResolverInterface $commandHandlerResolver, CommandPipelineResolverInterface $commandpipelineResolver)
+    public function __construct(CommandHandlerResolverInterface $commandHandlerResolver, CommandPipelineResolverInterface $commandPipelineResolver)
     {
         $this->commandHandlerResolver = $commandHandlerResolver;
-        $this->commandPipelineResolver = $commandpipelineResolver;
+        $this->commandPipelineResolver = $commandPipelineResolver;
     }
 
     public function execute(CommandInterface $command): void
