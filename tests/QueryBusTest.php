@@ -150,7 +150,8 @@ final class QueryBusTest extends TestCase
     public function shouldThrowWhenHandlerIsNotFound()
     {
         // Arrange
-        $query = new UnknowTestQuery();
+        $query = new class() implements QueryInterface {
+        };
 
         $this->queryHandlerResolver
             ->method('get')
@@ -301,8 +302,4 @@ class TestQueryReadModel
     {
         return $this->result;
     }
-}
-
-class UnknowTestQuery implements QueryInterface
-{
 }
