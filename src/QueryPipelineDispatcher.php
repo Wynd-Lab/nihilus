@@ -10,35 +10,35 @@ class QueryPipelineDispatcher
     /**
      * @var QueryHandlerInterface
      */
-    private $handler;
+    private $queryHandler;
 
-    public function __construct(QueryHandlerInterface $handler)
+    public function __construct(QueryHandlerInterface $queryHandler)
     {
-        $this->handler = $handler;
+        $this->queryHandler = $queryHandler;
     }
 
-    public function addPipeline(QueryPipelineInterface $pipeline): void
+    public function addPipeline(QueryPipelineInterface $queryPipeline): void
     {
-        $next = $this->handler;
-        $this->handler = new class($pipeline, $next) implements QueryHandlerInterface {
-            private $pipeline;
+        $next = $this->queryHandler;
+        $this->queryHandler = new class($queryPipeline, $next) implements QueryHandlerInterface {
+            private $queryPipeline;
             private $next;
 
-            public function __construct(QueryPipelineInterface $pipeline, QueryHandlerInterface $next)
+            public function __construct(QueryPipelineInterface $queryPipeline, QueryHandlerInterface $next)
             {
-                $this->pipeline = $pipeline;
+                $this->queryPipeline = $queryPipeline;
                 $this->next = $next;
             }
 
             public function handle(QueryInterface $query): object
             {
-                return $this->pipeline->handle($query, $this->next);
+                return $this->queryPipeline->handle($query, $this->next);
             }
         };
     }
 
     public function handle(QueryInterface $query): object
     {
-        return $this->handler->handle($query);
+        return $this->queryHandler->handle($query);
     }
 }
