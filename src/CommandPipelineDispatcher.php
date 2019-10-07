@@ -5,7 +5,7 @@ namespace Nihilus\Handling;
 /**
  * @internal
  */
-class PipelineDispatcher
+class CommandPipelineDispatcher
 {
     /**
      * @var CommandHandlerInterface

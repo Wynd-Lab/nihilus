@@ -32,12 +32,12 @@ class CommandBus implements CommandBusInteface
 
         $commandPipelines = $this->commandPipelineResolver->getGlobals();
 
-        $pipelineDispatcher = new PipelineDispatcher($commandHandler);
+        $commandPipelineDispatcher = new CommandPipelineDispatcher($commandHandler);
 
         foreach ($commandPipelines as $commandPipeline) {
-            $pipelineDispatcher->addPipeline($commandPipeline);
+            $commandPipelineDispatcher->addPipeline($commandPipeline);
         }
 
-        $pipelineDispatcher->handle($command);
+        $commandPipelineDispatcher->handle($command);
     }
 }
