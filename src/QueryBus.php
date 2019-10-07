@@ -16,28 +16,28 @@ class QueryBus implements QueryBusInterface
      */
     private $queryPipelineResolver;
 
-    public function __construct(QueryHandlerResolverInterface $queryHandlerResovler, QueryPipelineResolverInterface $pipelineResolver)
+    public function __construct(QueryHandlerResolverInterface $queryHandlerResovler, QueryPipelineResolverInterface $queryPipelineResolver)
     {
         $this->queryHandlerResolver = $queryHandlerResovler;
-        $this->queryPipelineResolver = $pipelineResolver;
+        $this->queryPipelineResolver = $queryPipelineResolver;
     }
 
     public function execute(QueryInterface $query): object
     {
-        $handler = $this->queryHandlerResolver->get($query);
+        $queryHandler = $this->queryHandlerResolver->get($query);
 
-        if (null === $handler) {
+        if (null === $queryHandler) {
             throw new UnknowQueryException($query);
         }
 
-        $pipelines = $this->queryPipelineResolver->getGlobals();
+        $queryPipelines = $this->queryPipelineResolver->getGlobals();
 
-        $pipelineDispatcher = new QueryPipelineDispatcher($handler);
+        $queryPipelineDispatcher = new QueryPipelineDispatcher($queryHandler);
 
-        foreach ($pipelines as $pipeline) {
-            $pipelineDispatcher->addPipeline($pipeline);
+        foreach ($queryPipelines as $queryPipeline) {
+            $queryPipelineDispatcher->addPipeline($queryPipeline);
         }
 
-        return $pipelineDispatcher->handle($query);
+        return $queryPipelineDispatcher->handle($query);
     }
 }
