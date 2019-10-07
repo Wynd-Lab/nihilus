@@ -88,12 +88,12 @@ final class CommandBusTest extends TestCase
 
         $this->commandPipelineResolver = $this
             ->getMockBuilder(CommandPipelineResolverInterface::class)
-            ->setMethods((['getGlobalCommandPipelines']))
+            ->setMethods((['getGlobals']))
             ->getMock()
         ;
 
         $this->commandPipelineResolver
-            ->method('getGlobalCommandPipelines')
+            ->method('getGlobals')
             ->will($this->returnCallback(
                 function () {
                     return $this->pipelineResolverReturn;

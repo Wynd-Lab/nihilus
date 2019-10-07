@@ -7,5 +7,5 @@ interface CommandPipelineResolverInterface
     /**
      * @return CommandPipelineInterface[]
      */
-    public function getGlobalCommandPipelines(): array;
+    public function getGlobals(): array;
 }
