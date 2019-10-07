@@ -23,7 +23,7 @@ final class CommandBusTest extends TestCase
     /**
      * @var CommandHandlerInterface
      */
-    private $handler;
+    private $commandHandler;
 
     /**
      * @var CommandHandlerResolverInterface
@@ -57,7 +57,7 @@ final class CommandBusTest extends TestCase
 
         $this->command = $command;
 
-        $this->handler = $this
+        $this->commandHandler = $this
             ->getMockBuilder(CommandHandlerInterface::class)
             ->setMethods(['handle'])
             ->getMock()
@@ -78,7 +78,7 @@ final class CommandBusTest extends TestCase
             ))
         ;
 
-        $this->commandHandlerResolverReturn = $this->handler;
+        $this->commandHandlerResolverReturn = $this->commandHandler;
 
         $this->pipeline = $this
             ->getMockBuilder(CommandPipelineInterface::class)
@@ -113,7 +113,7 @@ final class CommandBusTest extends TestCase
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
 
         // Assert
-        $this->handler
+        $this->commandHandler
             ->expects($this->once())
             ->method('handle')
             ->with($this->command)
@@ -176,7 +176,7 @@ final class CommandBusTest extends TestCase
         }];
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
 
-        $this->handler
+        $this->commandHandler
             ->expects($this->once())
             ->method('handle')
             ->with($this->command)
@@ -199,7 +199,7 @@ final class CommandBusTest extends TestCase
         }];
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
 
-        $this->handler
+        $this->commandHandler
             ->expects($this->never())
             ->method('handle')
             ->with($this->command)
