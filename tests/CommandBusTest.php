@@ -43,12 +43,12 @@ final class CommandBusTest extends TestCase
     /**
      * @var CommandPipelineInterface[]
      */
-    private $pipelineResolverReturn;
+    private $commandPipelineResolverReturn;
 
     /**
      * @var CommandPipelineInterface
      */
-    private $pipeline;
+    private $commandPipeline;
 
     public function setUp()
     {
@@ -80,7 +80,7 @@ final class CommandBusTest extends TestCase
 
         $this->commandHandlerResolverReturn = $this->commandHandler;
 
-        $this->pipeline = $this
+        $this->commandPipeline = $this
             ->getMockBuilder(CommandPipelineInterface::class)
             ->setMethods(['handle'])
             ->getMock()
@@ -96,12 +96,12 @@ final class CommandBusTest extends TestCase
             ->method('getGlobals')
             ->will($this->returnCallback(
                 function () {
-                    return $this->pipelineResolverReturn;
+                    return $this->commandPipelineResolverReturn;
                 }
             ))
         ;
 
-        $this->pipelineResolverReturn = [];
+        $this->commandPipelineResolverReturn = [];
     }
 
     /**
@@ -148,11 +148,11 @@ final class CommandBusTest extends TestCase
     public function shouldExecutePipelineWhenHandleACommand()
     {
         // Arrange
-        $this->pipelineResolverReturn = [$this->pipeline];
+        $this->commandPipelineResolverReturn = [$this->commandPipeline];
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
 
         // Assert
-        $this->pipeline
+        $this->commandPipeline
             ->expects($this->once())
             ->method('handle')
             ->with($this->command)
@@ -168,7 +168,7 @@ final class CommandBusTest extends TestCase
     public function shouldHandleCommandWhenPipelineDontBreakTheExecutionFlow()
     {
         // Arrange
-        $this->pipelineResolverReturn = [new class() implements CommandPipelineInterface {
+        $this->commandPipelineResolverReturn = [new class() implements CommandPipelineInterface {
             public function handle(CommandInterface $command, CommandHandlerInterface $next): void
             {
                 $next->handle($command);
@@ -192,7 +192,7 @@ final class CommandBusTest extends TestCase
     public function shouldBreakTheExecutionFlowWhenPipelineDontHandleCommandWithTheNextPipeline()
     {
         // Arrange
-        $this->pipelineResolverReturn = [new class() implements CommandPipelineInterface {
+        $this->commandPipelineResolverReturn = [new class() implements CommandPipelineInterface {
             public function handle(CommandInterface $command, CommandHandlerInterface $next): void
             {
             }
