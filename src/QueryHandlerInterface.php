@@ -4,5 +4,5 @@ namespace Nihilus\Handling;
 
 interface QueryHandlerInterface
 {
-    public function handle(QueryInterface $command): object;
+    public function handle(QueryInterface $query): object;
 }
