@@ -24,18 +24,18 @@ class CommandBus implements CommandBusInteface
 
     public function execute(CommandInterface $command): void
     {
-        $handler = $this->commandHandlerResolver->get($command);
+        $commandHandler = $this->commandHandlerResolver->get($command);
 
-        if (null === $handler) {
+        if (null === $commandHandler) {
             throw new UnknowCommandException($command);
         }
 
-        $pipelines = $this->commandPipelineResolver->getGlobals();
+        $commandPipelines = $this->commandPipelineResolver->getGlobals();
 
-        $pipelineDispatcher = new PipelineDispatcher($handler);
+        $pipelineDispatcher = new PipelineDispatcher($commandHandler);
 
-        foreach ($pipelines as $pipeline) {
-            $pipelineDispatcher->addPipeline($pipeline);
+        foreach ($commandPipelines as $commandPipeline) {
+            $pipelineDispatcher->addPipeline($commandPipeline);
         }
 
         $pipelineDispatcher->handle($command);
