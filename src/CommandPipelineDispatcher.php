@@ -5,40 +5,40 @@ namespace Nihilus\Handling;
 /**
  * @internal
  */
-class PipelineDispatcher
+class CommandPipelineDispatcher
 {
     /**
      * @var CommandHandlerInterface
      */
-    private $handler;
+    private $commandHandler;
 
-    public function __construct(CommandHandlerInterface $handler)
+    public function __construct(CommandHandlerInterface $commandHandler)
     {
-        $this->handler = $handler;
+        $this->commandHandler = $commandHandler;
     }
 
-    public function addPipeline(CommandPipelineInterface $pipeline): void
+    public function addPipeline(CommandPipelineInterface $commandPipeline): void
     {
-        $next = $this->handler;
-        $this->handler = new class($pipeline, $next) implements CommandHandlerInterface {
-            private $pipeline;
+        $next = $this->commandHandler;
+        $this->commandHandler = new class($commandPipeline, $next) implements CommandHandlerInterface {
+            private $commandPipeline;
             private $next;
 
-            public function __construct(CommandPipelineInterface $pipeline, CommandHandlerInterface $next)
+            public function __construct(CommandPipelineInterface $commandPipeline, CommandHandlerInterface $next)
             {
-                $this->pipeline = $pipeline;
+                $this->commandPipeline = $commandPipeline;
                 $this->next = $next;
             }
 
             public function handle(CommandInterface $command): void
             {
-                $this->pipeline->handle($command, $this->next);
+                $this->commandPipeline->handle($command, $this->next);
             }
         };
     }
 
     public function handle(CommandInterface $command): void
     {
-        $this->handler->handle($command);
+        $this->commandHandler->handle($command);
     }
 }

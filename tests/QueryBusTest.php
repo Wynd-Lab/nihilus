@@ -16,21 +16,29 @@ use PHPUnit\Framework\TestCase;
 final class QueryBusTest extends TestCase
 {
     /**
-     * @var string
+     * @var QueryInterface
      */
-    private $uid;
+    private $query;
+
+    /**
+     * @var object
+     */
+    private $queryResult;
+
+    /**
+     * @var QueryHandlerInterface
+     */
+    private $queryHandler;
+
+    /**
+     * @var QueryHandlerInterface
+     */
+    private $queryHandlerResolverReturn;
 
     /**
      * @var QueryHandlerResolverInterface
      */
     private $queryHandlerResolver;
-
-    /**
-     * @var TestQuery
-     */
-    private $query;
-
-    private $handler;
 
     /**
      * @var QueryPipelineResolverInterface
@@ -49,10 +57,39 @@ final class QueryBusTest extends TestCase
 
     public function setUp()
     {
-        $this->uid = uniqid();
-        $this->query = new TestQuery($this->uid);
+        $uid = uniqid();
+        $this->queryResult = new class($uid) {
+            /**
+             * @var string
+             */
+            private $value;
 
-        $this->handler = $this
+            public function __construct(string $value)
+            {
+                $this->value = $value;
+            }
+
+            public function getValue(): string
+            {
+                return $this->result;
+            }
+        };
+
+        $this->query = new class($uid) implements QueryInterface {
+            private $prop;
+
+            public function __construct(string $value)
+            {
+                $this->prop = $value;
+            }
+
+            public function getProp(): string
+            {
+                return $this->prop;
+            }
+        };
+
+        $this->queryHandler = $this
             ->getMockBuilder(QueryHandlerInterface::class)
             ->setMethods(['handle'])
             ->getMock()
@@ -64,6 +101,17 @@ final class QueryBusTest extends TestCase
             ->getMock()
         ;
 
+        $this->queryHandlerResolver
+            ->method('get')
+            ->will($this->returnCallback(
+                function () {
+                    return $this->queryHandlerResolverReturn;
+                }
+            ))
+        ;
+
+        $this->queryHandlerResolverReturn = $this->queryHandler;
+
         $this->queryPipeline = $this
             ->getMockBuilder(QueryPipelineInterface::class)
             ->setMethods(['handle'])
@@ -72,12 +120,12 @@ final class QueryBusTest extends TestCase
 
         $this->queryPipelineResolver = $this
             ->getMockBuilder(QueryPipelineResolverInterface::class)
-            ->setMethods((['getGlobalQueryPipelines']))
+            ->setMethods((['getGlobals']))
             ->getMock()
         ;
 
         $this->queryPipelineResolver
-            ->method('getGlobalQueryPipelines')
+            ->method('getGlobals')
             ->will($this->returnCallback(
                 function () {
                     return $this->queryPipelineResolverReturn;
@@ -94,15 +142,9 @@ final class QueryBusTest extends TestCase
     public function shouldHandleQueryWhenExecuteAQuery()
     {
         // Arrange
-        $expected = new TestQueryReadModel($this->uid);
+        $expected = $this->queryResult;
 
-        $this->queryHandlerResolver
-            ->method('get')
-            ->with($this->query)
-            ->willReturn($this->handler)
-        ;
-
-        $this->handler
+        $this->queryHandler
             ->method('handle')
             ->with($this->query)
             ->willReturn($expected)
@@ -122,18 +164,18 @@ final class QueryBusTest extends TestCase
     public function shouldHandleQueryOnceWhenExecuteAQuery()
     {
         // Arrange
-        $expected = new TestQueryReadModel($this->uid);
+        $expected = $this->queryResult;
 
         $this->queryHandlerResolver
             ->method('get')
             ->with($this->query)
-            ->willReturn($this->handler)
+            ->willReturn($this->queryHandler)
         ;
 
         $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryPipelineResolver);
 
         // Assert
-        $this->handler
+        $this->queryHandler
             ->expects($this->once())
             ->method('handle')
             ->with($this->query)
@@ -150,7 +192,9 @@ final class QueryBusTest extends TestCase
     public function shouldThrowWhenHandlerIsNotFound()
     {
         // Arrange
-        $query = new UnknowTestQuery();
+        $this->queryHandlerResolverReturn = null;
+        $query = new class() implements QueryInterface {
+        };
 
         $this->queryHandlerResolver
             ->method('get')
@@ -173,20 +217,19 @@ final class QueryBusTest extends TestCase
     public function shouldExecutePipelineWhenHandleAQuery()
     {
         // Arrange
-        $expected = new TestQueryReadModel($this->uid);
         $this->queryPipelineResolverReturn = [$this->queryPipeline];
         $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryPipelineResolver);
 
         $this->queryHandlerResolver
             ->method('get')
             ->with($this->query)
-            ->willReturn($this->handler)
+            ->willReturn($this->queryHandler)
         ;
 
-        $this->handler
+        $this->queryHandler
             ->method('handle')
             ->with($this->query)
-            ->willReturn($expected)
+            ->willReturn($this->queryResult)
         ;
 
         // Assert
@@ -206,7 +249,6 @@ final class QueryBusTest extends TestCase
     public function shouldHandleQueryWhenPipelineDontBreakTheExecutionFlow()
     {
         // Arrange
-        $expected = new TestQueryReadModel($this->uid);
         $this->queryPipelineResolverReturn = [new class() implements QueryPipelineInterface {
             public function handle(QueryInterface $query, QueryHandlerInterface $next): object
             {
@@ -217,18 +259,18 @@ final class QueryBusTest extends TestCase
         $this->queryHandlerResolver
             ->method('get')
             ->with($this->query)
-            ->willReturn($this->handler)
+            ->willReturn($this->queryHandler)
         ;
 
-        $this->handler
+        $this->queryHandler
             ->method('handle')
             ->with($this->query)
-            ->willReturn($expected)
+            ->willReturn($this->queryResult)
         ;
 
         $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryPipelineResolver);
 
-        $this->handler
+        $this->queryHandler
             ->expects($this->once())
             ->method('handle')
             ->with($this->query)
@@ -256,10 +298,10 @@ final class QueryBusTest extends TestCase
         $this->queryHandlerResolver
             ->method('get')
             ->with($this->query)
-            ->willReturn($this->handler)
+            ->willReturn($this->queryHandler)
         ;
 
-        $this->handler
+        $this->queryHandler
             ->expects($this->never())
             ->method('handle')
             ->with($this->query)
@@ -268,41 +310,4 @@ final class QueryBusTest extends TestCase
         // Act
         $queryBus->execute($this->query);
     }
-}
-
-class TestQuery implements QueryInterface
-{
-    private $prop;
-
-    public function __construct(string $value)
-    {
-        $this->prop = $value;
-    }
-
-    public function getProp(): string
-    {
-        return $this->prop;
-    }
-}
-
-class TestQueryReadModel
-{
-    /**
-     * @var string
-     */
-    private $value;
-
-    public function __construct(string $value)
-    {
-        $this->value = $value;
-    }
-
-    public function getValue(): string
-    {
-        return $this->result;
-    }
-}
-
-class UnknowTestQuery implements QueryInterface
-{
 }
