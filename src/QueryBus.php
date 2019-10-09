@@ -1,8 +1,6 @@
 <?php
 
-namespace Nihilus\Handling;
-
-use Nihilus\Handling\Exceptions\UnknowQueryException;
+namespace Nihilus;
 
 class QueryBus implements QueryBusInterface
 {

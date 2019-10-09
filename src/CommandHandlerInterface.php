@@ -1,6 +1,6 @@
 <?php
 
-namespace Nihilus\Handling;
+namespace Nihilus;
 
 interface CommandHandlerInterface
 {

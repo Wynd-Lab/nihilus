@@ -1,12 +1,12 @@
 <?php
 
-use Nihilus\Handling\CommandBus;
-use Nihilus\Handling\CommandHandlerInterface;
-use Nihilus\Handling\CommandHandlerResolverInterface;
-use Nihilus\Handling\CommandInterface;
-use Nihilus\Handling\CommandPipelineInterface;
-use Nihilus\Handling\CommandPipelineResolverInterface;
-use Nihilus\Handling\Exceptions\UnknowCommandException;
+use Nihilus\CommandBus;
+use Nihilus\CommandHandlerInterface;
+use Nihilus\CommandHandlerResolverInterface;
+use Nihilus\CommandInterface;
+use Nihilus\CommandPipelineInterface;
+use Nihilus\CommandPipelineResolverInterface;
+use Nihilus\UnknowCommandException;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -1,12 +1,12 @@
 <?php
 
-use Nihilus\Handling\Exceptions\UnknowQueryException;
-use Nihilus\Handling\QueryBus;
-use Nihilus\Handling\QueryHandlerInterface;
-use Nihilus\Handling\QueryHandlerResolverInterface;
-use Nihilus\Handling\QueryInterface;
-use Nihilus\Handling\QueryPipelineInterface;
-use Nihilus\Handling\QueryPipelineResolverInterface;
+use Nihilus\QueryBus;
+use Nihilus\QueryHandlerInterface;
+use Nihilus\QueryHandlerResolverInterface;
+use Nihilus\QueryInterface;
+use Nihilus\QueryPipelineInterface;
+use Nihilus\QueryPipelineResolverInterface;
+use Nihilus\UnknowQueryException;
 use PHPUnit\Framework\TestCase;
 
 /**

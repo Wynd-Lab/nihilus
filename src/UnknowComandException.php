@@ -1,9 +1,8 @@
 <?php
 
-namespace Nihilus\Handling\Exceptions;
+namespace Nihilus;
 
 use Exception;
-use Nihilus\Handling\CommandInterface;
 
 class UnknowCommandException extends Exception
 {
