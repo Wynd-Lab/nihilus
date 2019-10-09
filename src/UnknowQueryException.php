@@ -1,8 +1,6 @@
 <?php
 
-namespace Nihilus\Handling\Exceptions;
-
-use Nihilus\Handling\QueryInterface;
+namespace Nihilus;
 
 class UnknowQueryException extends \Exception
 {

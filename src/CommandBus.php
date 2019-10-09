@@ -1,8 +1,6 @@
 <?php
 
-namespace Nihilus\Handling;
-
-use Nihilus\Handling\Exceptions\UnknowCommandException;
+namespace Nihilus;
 
 class CommandBus implements CommandBusInteface
 {
