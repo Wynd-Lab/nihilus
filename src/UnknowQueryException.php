@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Nihilus;
 
 class UnknowQueryException extends \Exception
