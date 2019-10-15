@@ -16,9 +16,9 @@ class QueryBus implements QueryBusInterface
      */
     private $queryPipelineResolver;
 
-    public function __construct(QueryHandlerResolverInterface $queryHandlerResovler, QueryPipelineResolverInterface $queryPipelineResolver)
+    public function __construct(QueryHandlerResolverInterface $queryHandlerResolver, QueryPipelineResolverInterface $queryPipelineResolver)
     {
-        $this->queryHandlerResolver = $queryHandlerResovler;
+        $this->queryHandlerResolver = $queryHandlerResolver;
         $this->queryPipelineResolver = $queryPipelineResolver;
     }
 
