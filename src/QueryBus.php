@@ -9,35 +9,35 @@ class QueryBus implements QueryBusInterface
     /**
      * @var QueryHandlerResolverInterface
      */
-    private $queryHandlerResolver;
+    private $handlerResolver;
 
     /**
      * @var QueryPipelineResolverInterface
      */
-    private $queryPipelineResolver;
+    private $pipelineResolver;
 
-    public function __construct(QueryHandlerResolverInterface $queryHandlerResolver, QueryPipelineResolverInterface $queryPipelineResolver)
+    public function __construct(QueryHandlerResolverInterface $handlerResolver, QueryPipelineResolverInterface $pipelineResolver)
     {
-        $this->queryHandlerResolver = $queryHandlerResolver;
-        $this->queryPipelineResolver = $queryPipelineResolver;
+        $this->handlerResolver = $handlerResolver;
+        $this->pipelineResolver = $pipelineResolver;
     }
 
     public function execute(QueryInterface $query): object
     {
-        $queryHandler = $this->queryHandlerResolver->get($query);
+        $queryHandler = $this->handlerResolver->get($query);
 
         if (null === $queryHandler) {
             throw new UnknowQueryException($query);
         }
 
-        $queryPipelines = $this->queryPipelineResolver->getGlobals();
+        $queryPipelines = $this->pipelineResolver->getGlobals();
 
-        $queryPipelineDispatcher = new QueryPipelineDispatcher($queryHandler);
+        $pipelineDispatcher = new QueryPipelineDispatcher($queryHandler);
 
         foreach ($queryPipelines as $queryPipeline) {
-            $queryPipelineDispatcher->addPipeline($queryPipeline);
+            $pipelineDispatcher->addPipeline($queryPipeline);
         }
 
-        return $queryPipelineDispatcher->handle($query);
+        return $pipelineDispatcher->handle($query);
     }
 }

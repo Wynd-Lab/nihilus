@@ -9,35 +9,35 @@ class CommandBus implements CommandBusInteface
     /**
      * @var CommandHandlerResolverInterface
      */
-    private $commandHandlerResolver;
+    private $handlerResolver;
 
     /**
      * @var CommandPipelineResolverInterface
      */
-    private $commandPipelineResolver;
+    private $pipelineResolver;
 
-    public function __construct(CommandHandlerResolverInterface $commandHandlerResolver, CommandPipelineResolverInterface $commandPipelineResolver)
+    public function __construct(CommandHandlerResolverInterface $handlerResolver, CommandPipelineResolverInterface $pipelineResolver)
     {
-        $this->commandHandlerResolver = $commandHandlerResolver;
-        $this->commandPipelineResolver = $commandPipelineResolver;
+        $this->handlerResolver = $handlerResolver;
+        $this->pipelineResolver = $pipelineResolver;
     }
 
     public function execute(CommandInterface $command): void
     {
-        $commandHandler = $this->commandHandlerResolver->get($command);
+        $commandHandler = $this->handlerResolver->get($command);
 
         if (null === $commandHandler) {
             throw new UnknowCommandException($command);
         }
 
-        $commandPipelines = $this->commandPipelineResolver->getGlobals();
+        $commandPipelines = $this->pipelineResolver->getGlobals();
 
-        $commandPipelineDispatcher = new CommandPipelineDispatcher($commandHandler);
+        $pipelineDispatcher = new CommandPipelineDispatcher($commandHandler);
 
         foreach ($commandPipelines as $commandPipeline) {
-            $commandPipelineDispatcher->addPipeline($commandPipeline);
+            $pipelineDispatcher->addPipeline($commandPipeline);
         }
 
-        $commandPipelineDispatcher->handle($command);
+        $pipelineDispatcher->handle($command);
     }
 }
