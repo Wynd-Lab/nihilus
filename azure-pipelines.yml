@@ -28,5 +28,5 @@ steps:
 - script: composer lint
   displayName: 'composer lint'
 
-- script: composer tests
+- script: composer test
   displayName: 'composer test'
