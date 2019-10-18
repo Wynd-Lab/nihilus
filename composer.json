@@ -1,14 +1,22 @@
 {
-    "name": "spontoreau/nihilus",
+    "name": "wynd/nihilus",
     "type": "library",
     "license": "MIT",
+    "homepage": "https://github.com/Wynd-Lab/nihilus",
+    "readme": "https://github.com/Wynd-Lab/nihilus/blob/master/README.md",
+    "description": "CQRS component with 0 dependencies. Built by Wynd with PHP and ️❤️!",
     "authors": [
         {
             "name": "Sylvain Pontoreau",
-            "email": "pontoreau.sylvain@gmail.com"
+            "email": "spontoreau@wynd.eu"
         }
     ],
-    "description": "CQRS",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Wynd-Lab/nihilus"
+        }
+    ],
     "scripts": {
         "test": "vendor/bin/phpunit tests --bootstrap vendor/autoload.php",
         "test:watch": "vendor/bin/phpunit-watcher watch tests/*",
@@ -16,9 +24,10 @@
         "lint": "vendor/bin/phpmd src text codesize,cleancode,design,naming,controversial,unusedcode"
     },
     "autoload": {
-        "classmap": ["src"]
+        "psr-4": { "Nihilus\\" : ["src/"] }
     },
-    "require": {
+    "autoload-dev": {
+        "psr-4": { "Nihilus\\" : ["tests/"] }
     },
     "require-dev": {
         "phpunit/phpunit": "^7.5",
