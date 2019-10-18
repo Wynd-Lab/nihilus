@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Nihilus;
 
-class CommandBus implements CommandBusInteface
+class CommandBus implements CommandBusInterface
 {
     /**
      * @var CommandHandlerResolverInterface
