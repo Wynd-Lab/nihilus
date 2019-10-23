@@ -4,8 +4,8 @@ use Nihilus\QueryBus;
 use Nihilus\QueryHandlerInterface;
 use Nihilus\QueryHandlerResolverInterface;
 use Nihilus\QueryInterface;
-use Nihilus\QueryPipelineInterface;
-use Nihilus\QueryPipelineResolverInterface;
+use Nihilus\QueryMiddlewareInterface;
+use Nihilus\QueryMiddlewareResolverInterface;
 use Nihilus\UnknowQueryException;
 use PHPUnit\Framework\TestCase;
 
@@ -41,19 +41,19 @@ final class QueryBusTest extends TestCase
     private $queryHandlerResolver;
 
     /**
-     * @var QueryPipelineResolverInterface
+     * @var QueryMiddlewareResolverInterface
      */
-    private $queryPipelineResolver;
+    private $queryMiddlewareResolver;
 
     /**
-     * @var QueryPipelineInterface[]
+     * @var QueryMiddlewareInterface[]
      */
-    private $queryPipelineResolverReturn;
+    private $queryMiddlewareResolverReturn;
 
     /**
-     * @var QueryPipelineInterface
+     * @var QueryMiddlewareInterface
      */
-    private $queryPipeline;
+    private $queryMiddleware;
 
     public function setUp()
     {
@@ -112,28 +112,28 @@ final class QueryBusTest extends TestCase
 
         $this->queryHandlerResolverReturn = $this->queryHandler;
 
-        $this->queryPipeline = $this
-            ->getMockBuilder(QueryPipelineInterface::class)
+        $this->queryMiddleware = $this
+            ->getMockBuilder(QueryMiddlewareInterface::class)
             ->setMethods(['handle'])
             ->getMock()
         ;
 
-        $this->queryPipelineResolver = $this
-            ->getMockBuilder(QueryPipelineResolverInterface::class)
+        $this->queryMiddlewareResolver = $this
+            ->getMockBuilder(QueryMiddlewareResolverInterface::class)
             ->setMethods((['getGlobals']))
             ->getMock()
         ;
 
-        $this->queryPipelineResolver
+        $this->queryMiddlewareResolver
             ->method('getGlobals')
             ->will($this->returnCallback(
                 function () {
-                    return $this->queryPipelineResolverReturn;
+                    return $this->queryMiddlewareResolverReturn;
                 }
             ))
         ;
 
-        $this->queryPipelineResolverReturn = [];
+        $this->queryMiddlewareResolverReturn = [];
     }
 
     /**
@@ -150,7 +150,7 @@ final class QueryBusTest extends TestCase
             ->willReturn($expected)
         ;
 
-        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryPipelineResolver);
+        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryMiddlewareResolver);
 
         // Act
         $actual = $queryBus->execute($this->query);
@@ -172,7 +172,7 @@ final class QueryBusTest extends TestCase
             ->willReturn($this->queryHandler)
         ;
 
-        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryPipelineResolver);
+        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryMiddlewareResolver);
 
         // Assert
         $this->queryHandler
@@ -202,7 +202,7 @@ final class QueryBusTest extends TestCase
             ->willReturn(null)
         ;
 
-        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryPipelineResolver);
+        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryMiddlewareResolver);
 
         // Assert
         $this->expectException(UnknowQueryException::class);
@@ -214,11 +214,11 @@ final class QueryBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldExecutePipelineWhenHandleAQuery()
+    public function shouldExecuteMiddlewareWhenHandleAQuery()
     {
         // Arrange
-        $this->queryPipelineResolverReturn = [$this->queryPipeline];
-        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryPipelineResolver);
+        $this->queryMiddlewareResolverReturn = [$this->queryMiddleware];
+        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryMiddlewareResolver);
 
         $this->queryHandlerResolver
             ->method('get')
@@ -233,7 +233,7 @@ final class QueryBusTest extends TestCase
         ;
 
         // Assert
-        $this->queryPipeline
+        $this->queryMiddleware
             ->expects($this->once())
             ->method('handle')
             ->with($this->query)
@@ -246,10 +246,10 @@ final class QueryBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldHandleQueryWhenPipelineDontBreakTheExecutionFlow()
+    public function shouldHandleQueryWhenMiddlewareDontBreakTheExecutionFlow()
     {
         // Arrange
-        $this->queryPipelineResolverReturn = [new class() implements QueryPipelineInterface {
+        $this->queryMiddlewareResolverReturn = [new class() implements QueryMiddlewareInterface {
             public function handle(QueryInterface $query, QueryHandlerInterface $next): object
             {
                 return $next->handle($query);
@@ -268,7 +268,7 @@ final class QueryBusTest extends TestCase
             ->willReturn($this->queryResult)
         ;
 
-        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryPipelineResolver);
+        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryMiddlewareResolver);
 
         $this->queryHandler
             ->expects($this->once())
@@ -283,17 +283,17 @@ final class QueryBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldBreakTheExecutionFlowWhenPipelineDontHandleQueryWithTheNextPipeline()
+    public function shouldBreakTheExecutionFlowWhenMiddlewareDontHandleQueryWithTheNextMiddleware()
     {
         // Arrange
-        $this->queryPipelineResolverReturn = [new class() implements QueryPipelineInterface {
+        $this->queryMiddlewareResolverReturn = [new class() implements QueryMiddlewareInterface {
             public function handle(QueryInterface $query, QueryHandlerInterface $next): object
             {
                 return new class() {
                 };
             }
         }];
-        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryPipelineResolver);
+        $queryBus = new QueryBus($this->queryHandlerResolver, $this->queryMiddlewareResolver);
 
         $this->queryHandlerResolver
             ->method('get')

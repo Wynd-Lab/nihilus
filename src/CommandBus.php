@@ -12,14 +12,14 @@ class CommandBus implements CommandBusInterface
     private $handlerResolver;
 
     /**
-     * @var CommandPipelineResolverInterface
+     * @var CommandMiddlewareResolverInterface
      */
-    private $pipelineResolver;
+    private $middlewareResolver;
 
-    public function __construct(CommandHandlerResolverInterface $handlerResolver, CommandPipelineResolverInterface $pipelineResolver)
+    public function __construct(CommandHandlerResolverInterface $handlerResolver, CommandMiddlewareResolverInterface $middlewareResolver)
     {
         $this->handlerResolver = $handlerResolver;
-        $this->pipelineResolver = $pipelineResolver;
+        $this->middlewareResolver = $middlewareResolver;
     }
 
     public function execute(CommandInterface $command): void
@@ -30,14 +30,14 @@ class CommandBus implements CommandBusInterface
             throw new UnknowCommandException($command);
         }
 
-        $commandPipelines = $this->pipelineResolver->getGlobals();
+        $commandMiddlewares = $this->middlewareResolver->getGlobals();
 
-        $pipelineDispatcher = new CommandPipelineDispatcher($commandHandler);
+        $middlewareDispatcher = new CommandMiddlewareDispatcher($commandHandler);
 
-        foreach ($commandPipelines as $commandPipeline) {
-            $pipelineDispatcher->addPipeline($commandPipeline);
+        foreach ($commandMiddlewares as $commandMiddleware) {
+            $middlewareDispatcher->addMiddleware($commandMiddleware);
         }
 
-        $pipelineDispatcher->handle($command);
+        $middlewareDispatcher->handle($command);
     }
 }
