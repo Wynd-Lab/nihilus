@@ -26,15 +26,15 @@ expected to uphold this code. Please report unacceptable behavior to [the projec
 
 ### <a id="bugs"></a>🐛 Bugs
 
-First, ensure your bug isn't listed in [issues](https://github.com/Wynd/Nihilus/issues). It is better to contribute to an existing issue instead of creating a new one. It's really important that you respect a specific format for your bug reports. This provides an optimal reading for contributors and ease the implementation of fixes. Template is available [here](/.github/ISSUE_TEMPLATE/bug_report.md).
+First, ensure your bug isn't listed in [issues](https://github.com/Wynd-Lab/Nihilus/issues). It is better to contribute to an existing issue instead of creating a new one. It's really important that you respect a specific format for your bug reports. This provides an optimal reading for contributors and ease the implementation of fixes. Template is available [here](/.github/ISSUE_TEMPLATE/bug_report.md).
 
 If a bug can be cover with an unit test, you are more than welcome to write it! It's one of the best way to quickly resolve the issue 👍
 
 ### <a id="features"></a>💡 Features
 
-First, ensure your feature isn't listed in [issues](https://github.com/Wynd/Nihilus/issues).
+First, ensure your feature isn't listed in [issues](https://github.com/Wynd-Lab/Nihilus/issues).
 
-A feature must be created as a proposal for discussion with the Wynd maintainers. When an agreement is found, the proposal is added as a feature inside a [project](https://github.com/Wynd/Nihilus/projects). A feature can be considered too large to be a single card in a project. If so, the team can decide to create the feature as a project and split it into multiples small features (for an easier integration inside the project). Like bugs, you must respect a specific format, a template is available [here](/.github/ISSUE_TEMPLATE/feature_request.md).
+A feature must be created as a proposal for discussion with the Wynd maintainers. When an agreement is found, the proposal is added as a feature inside a [project](https://github.com/Wynd-Lab/Nihilus/projects). A feature can be considered too large to be a single card in a project. If so, the team can decide to create the feature as a project and split it into multiples small features (for an easier integration inside the project). Like bugs, you must respect a specific format, a template is available [here](/.github/ISSUE_TEMPLATE/feature_request.md).
 
 
 ### <a id="pull-requests"></a>🎁 Pull Requests
