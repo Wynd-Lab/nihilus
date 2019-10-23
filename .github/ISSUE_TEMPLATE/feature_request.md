@@ -14,3 +14,10 @@ assignees: ''
 - [ ] First rule and it acceptances
 - [ ] Second rule and it acceptances
 - [ ] and so on...
+
+### Additional Information
+**Is this feature will introduce a breaking change ?**: [Pick one of the following: *Yes*|*No*]
+
+**Complexity**: [Pick one of the following: *Low*|*Medium*|*High*|*Critical*]
+
+**Other**: [Others information]
