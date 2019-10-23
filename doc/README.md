@@ -107,12 +107,12 @@ Wynd built a resolver for Symfony (more information on this [repository]())
 CommandBus usage:
 ```php
 use Nihilus\SymfonyResolver\CommandHandlerResolver;
-use Nihilus\SymfonyResolver\CommandPipelineResolver;
+use Nihilus\SymfonyResolver\CommandMiddlewareResolver;
 use Nihilus\CommandBus;
 
 $handlerResolver = new CommandHandlerResolver();
-$pipelineResolver = new CommandPipelineResolver();
-$commandBus = new CommandBus($handlerResolver, $pipelineResolver);
+$middlewareResolver = new CommandMiddlewareResolver();
+$commandBus = new CommandBus($handlerResolver, $middlewareResolver);
 
 $commandBus->execute(new ChangeUserEmailCommand(1, 'spontoreau@wynd.eu'));
 ```
@@ -120,29 +120,29 @@ $commandBus->execute(new ChangeUserEmailCommand(1, 'spontoreau@wynd.eu'));
 QueryBus usage:
 ```php
 use Nihilus\SymfonyResolver\QueryHandlerResolver;
-use Nihilus\SymfonyResolver\QueryPipelineResolver;
+use Nihilus\SymfonyResolver\QueryMiddlewareResolver;
 use Nihilus\QueryBus;
 
 $handlerResolver = new QueryHandlerResolver();
-$pipelineResolver = new QueryPipelineResolver();
-$queryBus = new QueryBus($handlerResolver, $pipelineResolver);
+$middlewareResolver = new QueryMiddlewareResolver();
+$queryBus = new QueryBus($handlerResolver, $middlewareResolver);
 
 $user = $queryBus->execute(new GetUserByIdQuery(1));
 var_dump($user);
 ```
 
-## Pipeline
+## Middleware
 
-Nihilus allow you to build your own pipeline directly inside CommandBus/QueryBus. Pipelines is a great way to execute generic behaviors during the Command/Query handling without using decorators. In the library, the PipelineDispatcher design is inspired by the PSR-15 middleware.
+Nihilus allow you to build your own middleware directly inside CommandBus/QueryBus. Middlewares is a great way to execute generic behaviors during the Command/Query handling without using decorators. In the library, the MiddlewareDispatcher design is inspired by the PSR-15 middleware.
 
-CommandPipeline example:
+CommandMiddleware example:
 
 ```php
-use Nihilus\CommandPipelineInterface;
+use Nihilus\CommandMiddlewareInterface;
 use Nihilus\CommandInterface;
 use Nihilus\CommandHandlerInterface;
 
-class LoggerCommandPipeline implements CommandPipelineInterface
+class LoggerCommandMiddleware implements CommandMiddlewareInterface
 {
     public function handle(CommandInterface $command, CommandHandlerInterface $next): void
     {
@@ -152,14 +152,14 @@ class LoggerCommandPipeline implements CommandPipelineInterface
 }
 ```
 
-QueryPipeline example:
+QueryMiddleware example:
 
 ```php
-use Nihilus\QueryPipelineInterface;
+use Nihilus\QueryMiddlewareInterface;
 use Nihilus\QueryInterface;
 use Nihilus\QueryHandlerInterface;
 
-class LoggerQueryPipeline implements QueryPipelineInterface
+class LoggerQueryMiddleware implements QueryMiddlewareInterface
 {
     public function handle(QueryInterface $query, QueryHandlerInterface $next): object
     {

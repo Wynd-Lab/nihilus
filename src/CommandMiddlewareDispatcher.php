@@ -7,7 +7,7 @@ namespace Nihilus;
 /**
  * @internal
  */
-class CommandPipelineDispatcher
+class CommandMiddlewareDispatcher
 {
     /**
      * @var CommandHandlerInterface
@@ -19,22 +19,22 @@ class CommandPipelineDispatcher
         $this->commandHandler = $commandHandler;
     }
 
-    public function addPipeline(CommandPipelineInterface $commandPipeline): void
+    public function addMiddleware(CommandMiddlewareInterface $commandMiddleware): void
     {
         $next = $this->commandHandler;
-        $this->commandHandler = new class($commandPipeline, $next) implements CommandHandlerInterface {
-            private $commandPipeline;
+        $this->commandHandler = new class($commandMiddleware, $next) implements CommandHandlerInterface {
+            private $commandMiddleware;
             private $next;
 
-            public function __construct(CommandPipelineInterface $commandPipeline, CommandHandlerInterface $next)
+            public function __construct(CommandMiddlewareInterface $commandMiddleware, CommandHandlerInterface $next)
             {
-                $this->commandPipeline = $commandPipeline;
+                $this->commandMiddleware = $commandMiddleware;
                 $this->next = $next;
             }
 
             public function handle(CommandInterface $command): void
             {
-                $this->commandPipeline->handle($command, $this->next);
+                $this->commandMiddleware->handle($command, $this->next);
             }
         };
     }

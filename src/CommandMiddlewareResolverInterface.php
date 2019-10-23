@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Nihilus;
 
-interface QueryPipelineResolverInterface
+interface CommandMiddlewareResolverInterface
 {
     /**
-     * @return QueryPipelineInterface[]
+     * @return CommandMiddlewareInterface[]
      */
     public function getGlobals(): array;
 }

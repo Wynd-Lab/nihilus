@@ -4,8 +4,8 @@ use Nihilus\CommandBus;
 use Nihilus\CommandHandlerInterface;
 use Nihilus\CommandHandlerResolverInterface;
 use Nihilus\CommandInterface;
-use Nihilus\CommandPipelineInterface;
-use Nihilus\CommandPipelineResolverInterface;
+use Nihilus\CommandMiddlewareInterface;
+use Nihilus\CommandMiddlewareResolverInterface;
 use Nihilus\UnknowCommandException;
 use PHPUnit\Framework\TestCase;
 
@@ -36,19 +36,19 @@ final class CommandBusTest extends TestCase
     private $commandHandlerResolverReturn;
 
     /**
-     * @var CommandPipelineResolverInterface
+     * @var CommandMiddlewareResolverInterface
      */
-    private $commandPipelineResolver;
+    private $commandMiddlewareResolver;
 
     /**
-     * @var CommandPipelineInterface[]
+     * @var CommandMiddlewareInterface[]
      */
-    private $commandPipelineResolverReturn;
+    private $commandMiddlewareResolverReturn;
 
     /**
-     * @var CommandPipelineInterface
+     * @var CommandMiddlewareInterface
      */
-    private $commandPipeline;
+    private $commandMiddleware;
 
     public function setUp()
     {
@@ -80,28 +80,28 @@ final class CommandBusTest extends TestCase
 
         $this->commandHandlerResolverReturn = $this->commandHandler;
 
-        $this->commandPipeline = $this
-            ->getMockBuilder(CommandPipelineInterface::class)
+        $this->commandMiddleware = $this
+            ->getMockBuilder(CommandMiddlewareInterface::class)
             ->setMethods(['handle'])
             ->getMock()
         ;
 
-        $this->commandPipelineResolver = $this
-            ->getMockBuilder(CommandPipelineResolverInterface::class)
+        $this->commandMiddlewareResolver = $this
+            ->getMockBuilder(CommandMiddlewareResolverInterface::class)
             ->setMethods((['getGlobals']))
             ->getMock()
         ;
 
-        $this->commandPipelineResolver
+        $this->commandMiddlewareResolver
             ->method('getGlobals')
             ->will($this->returnCallback(
                 function () {
-                    return $this->commandPipelineResolverReturn;
+                    return $this->commandMiddlewareResolverReturn;
                 }
             ))
         ;
 
-        $this->commandPipelineResolverReturn = [];
+        $this->commandMiddlewareResolverReturn = [];
     }
 
     /**
@@ -110,7 +110,7 @@ final class CommandBusTest extends TestCase
     public function shouldHandleCommandWhenExecuteACommand()
     {
         // Arrange
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
 
         // Assert
         $this->commandHandler
@@ -133,7 +133,7 @@ final class CommandBusTest extends TestCase
         $command = new class() implements CommandInterface {
         };
 
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
 
         // Assert
         $this->expectException(UnknowCommandException::class);
@@ -145,14 +145,14 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldExecutePipelineWhenHandleACommand()
+    public function shouldExecuteMiddlewareWhenHandleACommand()
     {
         // Arrange
-        $this->commandPipelineResolverReturn = [$this->commandPipeline];
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
+        $this->commandMiddlewareResolverReturn = [$this->commandMiddleware];
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
 
         // Assert
-        $this->commandPipeline
+        $this->commandMiddleware
             ->expects($this->once())
             ->method('handle')
             ->with($this->command)
@@ -165,16 +165,16 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldHandleCommandWhenPipelineDontBreakTheExecutionFlow()
+    public function shouldHandleCommandWhenMiddlewareDontBreakTheExecutionFlow()
     {
         // Arrange
-        $this->commandPipelineResolverReturn = [new class() implements CommandPipelineInterface {
+        $this->commandMiddlewareResolverReturn = [new class() implements CommandMiddlewareInterface {
             public function handle(CommandInterface $command, CommandHandlerInterface $next): void
             {
                 $next->handle($command);
             }
         }];
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
 
         $this->commandHandler
             ->expects($this->once())
@@ -189,15 +189,15 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldBreakTheExecutionFlowWhenPipelineDontHandleCommandWithTheNextPipeline()
+    public function shouldBreakTheExecutionFlowWhenMiddlewareDontHandleCommandWithTheNextMiddleware()
     {
         // Arrange
-        $this->commandPipelineResolverReturn = [new class() implements CommandPipelineInterface {
+        $this->commandMiddlewareResolverReturn = [new class() implements CommandMiddlewareInterface {
             public function handle(CommandInterface $command, CommandHandlerInterface $next): void
             {
             }
         }];
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandPipelineResolver);
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
 
         $this->commandHandler
             ->expects($this->never())

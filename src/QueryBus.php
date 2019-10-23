@@ -12,14 +12,14 @@ class QueryBus implements QueryBusInterface
     private $handlerResolver;
 
     /**
-     * @var QueryPipelineResolverInterface
+     * @var QueryMiddlewareResolverInterface
      */
-    private $pipelineResolver;
+    private $middlewareResolver;
 
-    public function __construct(QueryHandlerResolverInterface $handlerResolver, QueryPipelineResolverInterface $pipelineResolver)
+    public function __construct(QueryHandlerResolverInterface $handlerResolver, QueryMiddlewareResolverInterface $middlewareResolver)
     {
         $this->handlerResolver = $handlerResolver;
-        $this->pipelineResolver = $pipelineResolver;
+        $this->middlewareResolver = $middlewareResolver;
     }
 
     public function execute(QueryInterface $query): object
@@ -30,14 +30,14 @@ class QueryBus implements QueryBusInterface
             throw new UnknowQueryException($query);
         }
 
-        $queryPipelines = $this->pipelineResolver->getGlobals();
+        $queryMiddlewares = $this->middlewareResolver->getGlobals();
 
-        $pipelineDispatcher = new QueryPipelineDispatcher($queryHandler);
+        $middlewareDispatcher = new QueryMiddlewareDispatcher($queryHandler);
 
-        foreach ($queryPipelines as $queryPipeline) {
-            $pipelineDispatcher->addPipeline($queryPipeline);
+        foreach ($queryMiddlewares as $queryMiddleware) {
+            $middlewareDispatcher->addMiddleware($queryMiddleware);
         }
 
-        return $pipelineDispatcher->handle($query);
+        return $middlewareDispatcher->handle($query);
     }
 }

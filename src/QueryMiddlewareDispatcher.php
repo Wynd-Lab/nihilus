@@ -7,7 +7,7 @@ namespace Nihilus;
 /**
  * @internal
  */
-class QueryPipelineDispatcher
+class QueryMiddlewareDispatcher
 {
     /**
      * @var QueryHandlerInterface
@@ -19,22 +19,22 @@ class QueryPipelineDispatcher
         $this->queryHandler = $queryHandler;
     }
 
-    public function addPipeline(QueryPipelineInterface $queryPipeline): void
+    public function addMiddleware(QueryMiddlewareInterface $queryMiddleware): void
     {
         $next = $this->queryHandler;
-        $this->queryHandler = new class($queryPipeline, $next) implements QueryHandlerInterface {
-            private $queryPipeline;
+        $this->queryHandler = new class($queryMiddleware, $next) implements QueryHandlerInterface {
+            private $queryMiddleware;
             private $next;
 
-            public function __construct(QueryPipelineInterface $queryPipeline, QueryHandlerInterface $next)
+            public function __construct(QueryMiddlewareInterface $queryMiddleware, QueryHandlerInterface $next)
             {
-                $this->queryPipeline = $queryPipeline;
+                $this->queryMiddleware = $queryMiddleware;
                 $this->next = $next;
             }
 
             public function handle(QueryInterface $query): object
             {
-                return $this->queryPipeline->handle($query, $this->next);
+                return $this->queryMiddleware->handle($query, $this->next);
             }
         };
     }

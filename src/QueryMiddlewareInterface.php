@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Nihilus;
 
-interface QueryPipelineInterface
+interface QueryMiddlewareInterface
 {
     public function handle(QueryInterface $query, QueryHandlerInterface $next): object;
 }
