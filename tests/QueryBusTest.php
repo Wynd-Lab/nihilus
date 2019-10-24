@@ -120,12 +120,13 @@ final class QueryBusTest extends TestCase
 
         $this->queryMiddlewareResolver = $this
             ->getMockBuilder(QueryMiddlewareResolverInterface::class)
-            ->setMethods((['getGlobals']))
+            ->setMethods((['get']))
             ->getMock()
         ;
 
         $this->queryMiddlewareResolver
-            ->method('getGlobals')
+            ->method('get')
+            ->with($this->query)
             ->will($this->returnCallback(
                 function () {
                     return $this->queryMiddlewareResolverReturn;

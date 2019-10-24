@@ -9,5 +9,5 @@ interface QueryMiddlewareResolverInterface
     /**
      * @return QueryMiddlewareInterface[]
      */
-    public function getGlobals(): array;
+    public function get(QueryInterface $query): array;
 }

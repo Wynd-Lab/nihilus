@@ -30,7 +30,7 @@ class QueryBus implements QueryBusInterface
             throw new UnknowQueryException($query);
         }
 
-        $queryMiddlewares = $this->middlewareResolver->getGlobals();
+        $queryMiddlewares = $this->middlewareResolver->get($query);
 
         $middlewareDispatcher = new QueryMiddlewareDispatcher($queryHandler);
 
