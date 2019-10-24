@@ -23,4 +23,7 @@
             <directory>src</directory>
         </whitelist>
     </filter>
+    <logging>
+        <log type="junit" target="tmp/test-results.xml" />
+    </logging>
 </phpunit>
