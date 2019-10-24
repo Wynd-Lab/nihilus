@@ -30,7 +30,7 @@ class CommandBus implements CommandBusInterface
             throw new UnknowCommandException($command);
         }
 
-        $commandMiddlewares = $this->middlewareResolver->getGlobals();
+        $commandMiddlewares = $this->middlewareResolver->get($command);
 
         $middlewareDispatcher = new CommandMiddlewareDispatcher($commandHandler);
 

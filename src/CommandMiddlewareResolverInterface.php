@@ -9,5 +9,5 @@ interface CommandMiddlewareResolverInterface
     /**
      * @return CommandMiddlewareInterface[]
      */
-    public function getGlobals(): array;
+    public function get(CommandInterface $command): array;
 }
