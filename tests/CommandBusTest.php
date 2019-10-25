@@ -88,12 +88,13 @@ final class CommandBusTest extends TestCase
 
         $this->commandMiddlewareResolver = $this
             ->getMockBuilder(CommandMiddlewareResolverInterface::class)
-            ->setMethods((['getGlobals']))
+            ->setMethods((['get']))
             ->getMock()
         ;
 
         $this->commandMiddlewareResolver
-            ->method('getGlobals')
+            ->method('get')
+            ->with($this->command)
             ->will($this->returnCallback(
                 function () {
                     return $this->commandMiddlewareResolverReturn;
