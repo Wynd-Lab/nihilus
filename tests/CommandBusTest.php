@@ -283,53 +283,12 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldReturnASucceededResultWhenCommandWasPublished()
-    {
-        // Arrange
-        $expected = true;
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
-        $this->commandHandlersResolverReturn = [$this->commandHandler];
-
-        // Act
-        $result = $commandBus->publish($this->command);
-        $actual = $result->isSucceeded();
-
-        // Assert
-        $this->assertEquals($actual, $expected);
-    }
-
-    /**
-     * @test
-     */
-    public function shouldReturnAFailedResultWhenAHandlerThrowAnException()
-    {
-        // Arrange
-        $expected = false;
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
-
-        $this->commandHandler
-            ->method('handle')
-            ->will($this->throwException(new Error()))
-        ;
-
-        $this->commandHandlersResolverReturn = [$this->commandHandler];
-
-        // Act
-        $result = $commandBus->publish($this->command);
-        $actual = $result->isSucceeded();
-
-        // Assert
-        $this->assertEquals($actual, $expected);
-    }
-
-    /**
-     * @test
-     */
     public function shouldReturnAFailedResultWithErrorsWhenAHandlerThrowAnException()
     {
         // Arrange
-        $expectedFirst = new Error(uniqid());
-        $expectedSecond = new Error(uniqid());
+        $firstException = new Exception(uniqid());
+        $secondException = new Exception(uniqid());
+        $expected = [$firstException, $secondException];
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
 
         $mockedHandler = $this
@@ -345,24 +304,22 @@ final class CommandBusTest extends TestCase
 
         $this->commandHandler
             ->method('handle')
-            ->will($this->throwException($expectedFirst))
+            ->will($this->throwException($firstException))
         ;
 
         $mockedHandler
             ->method('handle')
-            ->will($this->throwException($expectedSecond))
+            ->will($this->throwException($secondException))
         ;
 
         // Act
-        $result = $commandBus->publish($this->command);
-        $errors = $result->getErrors();
-
-        $actualFirst = $errors[0];
-        $actualSecond = $errors[1];
-
-        // Assert
-        $this->assertEquals($actualFirst, $expectedFirst);
-        $this->assertEquals($actualSecond, $expectedSecond);
+        try {
+            $commandBus->publish($this->command);
+        } catch (Exception $exception) {
+            // Assert
+            $actual = $exception->getHandlerExceptions();
+            $this->assertEquals($expected, $actual);
+        }
     }
 
     /**
@@ -371,7 +328,7 @@ final class CommandBusTest extends TestCase
     public function shouldNotBreakTheExecutionFlowWhenAHandlerThrowAnException()
     {
         // Arrange
-        $expected = new Error(uniqid());
+        $expected = new Exception(uniqid());
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
 
         $mockedHandler = $this
@@ -398,6 +355,9 @@ final class CommandBusTest extends TestCase
         ;
 
         // Act
-        $result = $commandBus->publish($this->command);
+        try {
+            $commandBus->publish($this->command);
+        } catch (Exception $exception) {
+        }
     }
 }

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Nihilus;
 
-use Error;
+use Exception;
+use Nihilus\Exceptions\PublishException;
 use sizeof;
 
 class CommandBus implements CommandBusInterface
@@ -36,7 +37,7 @@ class CommandBus implements CommandBusInterface
         $this->executeHandler($commandHandler, $command);
     }
 
-    public function publish(CommandInterface $command): Result
+    public function publish(CommandInterface $command): void
     {
         $commandHandlers = $this->handlerResolver->getAll($command);
 
@@ -44,17 +45,19 @@ class CommandBus implements CommandBusInterface
             throw new UnknowCommandException($command);
         }
 
-        $result = new Result();
+        $exceptions = [];
 
         foreach ($commandHandlers as $commandHandler) {
             try {
                 $this->executeHandler($commandHandler, $command);
-            } catch (Error $e) {
-                $result->addError($e);
+            } catch (Exception $e) {
+                array_push($exceptions, $e);
             }
         }
 
-        return $result;
+        if (sizeof($exceptions) > 0) {
+            throw new PublishException($exceptions);
+        }
     }
 
     private function executeHandler(CommandHandlerInterface $handler, CommandInterface $command)
