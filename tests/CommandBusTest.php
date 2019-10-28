@@ -6,6 +6,7 @@ use Nihilus\CommandHandlerResolverInterface;
 use Nihilus\CommandInterface;
 use Nihilus\CommandMiddlewareInterface;
 use Nihilus\CommandMiddlewareResolverInterface;
+use Nihilus\PublishCommandException;
 use Nihilus\UnknowCommandException;
 use PHPUnit\Framework\TestCase;
 
@@ -93,7 +94,9 @@ final class CommandBusTest extends TestCase
         ;
 
         $this->commandHandlerResolverReturn = $this->commandHandler;
-        $this->commandHandlersResolverReturn = [];
+        $this->commandHandlersResolverReturn = [
+            $this->commandHandler,
+        ];
 
         $this->commandMiddleware = $this
             ->getMockBuilder(CommandMiddlewareInterface::class)
@@ -232,6 +235,8 @@ final class CommandBusTest extends TestCase
     {
         // Arrange
         $this->commandHandlerResolverReturn = null;
+        $this->commandHandlersResolverReturn = [];
+
         $command = new class() implements CommandInterface {
         };
 
@@ -283,43 +288,21 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldReturnAFailedResultWithErrorsWhenAHandlerThrowAnException()
+    public function shouldThrowExceptionWhenAHandlerThrowAnException()
     {
         // Arrange
-        $firstException = new Exception(uniqid());
-        $secondException = new Exception(uniqid());
-        $expected = [$firstException, $secondException];
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
-
-        $mockedHandler = $this
-            ->getMockBuilder(CommandHandlerInterface::class)
-            ->setMethods(['handle'])
-            ->getMock()
-        ;
-
-        $this->commandHandlersResolverReturn = [
-            $this->commandHandler,
-            $mockedHandler,
-        ];
 
         $this->commandHandler
             ->method('handle')
-            ->will($this->throwException($firstException))
+            ->will($this->throwException(new Exception(uniqid())))
         ;
 
-        $mockedHandler
-            ->method('handle')
-            ->will($this->throwException($secondException))
-        ;
+        // Assert
+        $this->expectException(PublishCommandException::class);
 
         // Act
-        try {
-            $commandBus->publish($this->command);
-        } catch (Exception $exception) {
-            // Assert
-            $actual = $exception->getHandlerExceptions();
-            $this->assertEquals($expected, $actual);
-        }
+        $commandBus->publish($this->command);
     }
 
     /**
@@ -354,10 +337,9 @@ final class CommandBusTest extends TestCase
             ->with($this->command)
         ;
 
+        $this->expectException(PublishCommandException::class);
+
         // Act
-        try {
-            $commandBus->publish($this->command);
-        } catch (Exception $exception) {
-        }
+        $commandBus->publish($this->command);
     }
 }
