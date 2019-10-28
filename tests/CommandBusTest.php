@@ -6,6 +6,7 @@ use Nihilus\CommandHandlerResolverInterface;
 use Nihilus\CommandInterface;
 use Nihilus\CommandMiddlewareInterface;
 use Nihilus\CommandMiddlewareResolverInterface;
+use Nihilus\PublishCommandException;
 use Nihilus\UnknowCommandException;
 use PHPUnit\Framework\TestCase;
 
@@ -34,6 +35,11 @@ final class CommandBusTest extends TestCase
      * @var CommandHandlerInterface
      */
     private $commandHandlerResolverReturn;
+
+    /**
+     * @var CommandHandlerInterface[]
+     */
+    private $commandHandlersResolverReturn;
 
     /**
      * @var CommandMiddlewareResolverInterface
@@ -65,7 +71,7 @@ final class CommandBusTest extends TestCase
 
         $this->commandHandlerResolver = $this
             ->getMockBuilder(CommandHandlerResolverInterface::class)
-            ->setMethods((['get']))
+            ->setMethods((['get', 'getAll']))
             ->getMock()
         ;
 
@@ -78,7 +84,19 @@ final class CommandBusTest extends TestCase
             ))
         ;
 
+        $this->commandHandlerResolver
+            ->method('getAll')
+            ->will($this->returnCallback(
+                function () {
+                    return $this->commandHandlersResolverReturn;
+                }
+            ))
+        ;
+
         $this->commandHandlerResolverReturn = $this->commandHandler;
+        $this->commandHandlersResolverReturn = [
+            $this->commandHandler,
+        ];
 
         $this->commandMiddleware = $this
             ->getMockBuilder(CommandMiddlewareInterface::class)
@@ -208,5 +226,120 @@ final class CommandBusTest extends TestCase
 
         // Act
         $commandBus->execute($this->command);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowWhenPublishWithNoHandler()
+    {
+        // Arrange
+        $this->commandHandlerResolverReturn = null;
+        $this->commandHandlersResolverReturn = [];
+
+        $command = new class() implements CommandInterface {
+        };
+
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
+
+        // Assert
+        $this->expectException(UnknowCommandException::class);
+
+        // Act
+        $commandBus->publish($command);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldHandleCommandWhenPublishACommand()
+    {
+        // Arrange
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
+
+        $mockedHandler = $this
+            ->getMockBuilder(CommandHandlerInterface::class)
+            ->setMethods(['handle'])
+            ->getMock()
+        ;
+
+        $this->commandHandlersResolverReturn = [
+            $this->commandHandler,
+            $mockedHandler,
+        ];
+
+        // Assert
+        $this->commandHandler
+            ->expects($this->once())
+            ->method('handle')
+            ->with($this->command)
+        ;
+
+        $mockedHandler
+            ->expects($this->once())
+            ->method('handle')
+            ->with($this->command)
+        ;
+
+        // Act
+        $commandBus->publish($this->command);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowExceptionWhenAHandlerThrowAnException()
+    {
+        // Arrange
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
+
+        $this->commandHandler
+            ->method('handle')
+            ->will($this->throwException(new Exception(uniqid())))
+        ;
+
+        // Assert
+        $this->expectException(PublishCommandException::class);
+
+        // Act
+        $commandBus->publish($this->command);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotBreakTheExecutionFlowWhenAHandlerThrowAnException()
+    {
+        // Arrange
+        $expected = new Exception(uniqid());
+        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
+
+        $mockedHandler = $this
+            ->getMockBuilder(CommandHandlerInterface::class)
+            ->setMethods(['handle'])
+            ->getMock()
+        ;
+
+        $this->commandHandlersResolverReturn = [
+            $this->commandHandler,
+            $mockedHandler,
+        ];
+
+        $this->commandHandler
+            ->method('handle')
+            ->will($this->throwException($expected))
+        ;
+
+        // Assert
+        $mockedHandler
+            ->expects($this->once())
+            ->method('handle')
+            ->with($this->command)
+        ;
+
+        $this->expectException(PublishCommandException::class);
+
+        // Act
+        $commandBus->publish($this->command);
     }
 }
