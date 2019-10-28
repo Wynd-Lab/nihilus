@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Nihilus\Exceptions;
+namespace Nihilus;
 
 use Exception;
 
-class PublishException extends Exception
+class PublishCommandException extends Exception
 {
     /**
      * @var Exception[]

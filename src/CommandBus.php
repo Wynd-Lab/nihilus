@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Nihilus;
 
 use Exception;
-use Nihilus\Exceptions\PublishException;
 use sizeof;
 
 class CommandBus implements CommandBusInterface
@@ -56,7 +55,7 @@ class CommandBus implements CommandBusInterface
         }
 
         if (sizeof($exceptions) > 0) {
-            throw new PublishException($exceptions);
+            throw new PublishCommandException($exceptions);
         }
     }
 
