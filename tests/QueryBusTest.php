@@ -140,7 +140,7 @@ final class QueryBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldHandleQueryWhenExecuteAQuery()
+    public function Given_AQueryBusWithHandlers_When_AQueryIsExecuted_Then_AHandlerReturnSomething()
     {
         // Arrange
         $expected = $this->queryResult;
@@ -162,7 +162,7 @@ final class QueryBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldHandleQueryOnceWhenExecuteAQuery()
+    public function Given_AQueryBusWithHandlers_When_AQueryIsExecuted_Then_AHandlerHandleItOnce()
     {
         // Arrange
         $expected = $this->queryResult;
@@ -190,7 +190,7 @@ final class QueryBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldThrowWhenHandlerIsNotFound()
+    public function Given_AQueryBusWithoutHandlers_When_AQueryIsExecuted_Then_AnUnkowQueryExceptionIsThrow()
     {
         // Arrange
         $this->queryHandlerResolverReturn = null;
@@ -215,7 +215,7 @@ final class QueryBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldExecuteMiddlewareWhenHandleAQuery()
+    public function Given_AQueryBusWithHandlersAndMiddlewares_When_AQueryIsExecuted_Then_MiddlewaresAreExecuted()
     {
         // Arrange
         $this->queryMiddlewareResolverReturn = [$this->queryMiddleware];
@@ -247,7 +247,7 @@ final class QueryBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldHandleQueryWhenMiddlewareDontBreakTheExecutionFlow()
+    public function Given_AQueryBusWithHandlersAndMiddlewares_When_AQueryIsExecuted_Then_AHandlerHandledIt()
     {
         // Arrange
         $this->queryMiddlewareResolverReturn = [new class() implements QueryMiddlewareInterface {
@@ -284,7 +284,7 @@ final class QueryBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldBreakTheExecutionFlowWhenMiddlewareDontHandleQueryWithTheNextMiddleware()
+    public function Given_AQueryBusWithHandlersAndMiddlewaresThatDontCallNextMiddleware_When_AQueryIsExecuted_Then_NoHandlerHandledIt()
     {
         // Arrange
         $this->queryMiddlewareResolverReturn = [new class() implements QueryMiddlewareInterface {

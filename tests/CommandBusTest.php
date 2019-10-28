@@ -126,7 +126,7 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldHandleCommandWhenExecuteACommand()
+    public function Given_ACommandBusWithHandlers_When_ACommandIsExecuted_Then_AHandlerHandledIt()
     {
         // Arrange
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
@@ -145,7 +145,7 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldThrowWhenHandlerIsNotFound()
+    public function Given_ACommandBusWithoutHandlers_When_ACommandIsExecuted_Then_AnUnkowCommandExceptionIsThrow()
     {
         // Arrange
         $this->commandHandlerResolverReturn = null;
@@ -164,7 +164,7 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldExecuteMiddlewareWhenHandleACommand()
+    public function Given_ACommandBusWithHandlersAndMiddlewares_When_ACommandIsExecuted_Then_MiddlewaresAreExecuted()
     {
         // Arrange
         $this->commandMiddlewareResolverReturn = [$this->commandMiddleware];
@@ -184,7 +184,7 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldHandleCommandWhenMiddlewareDontBreakTheExecutionFlow()
+    public function Given_ACommandBusWithHandlersAndMiddlewares_When_ACommandIsExecuted_Then_AHandlerHandledIt()
     {
         // Arrange
         $this->commandMiddlewareResolverReturn = [new class() implements CommandMiddlewareInterface {
@@ -208,7 +208,7 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldBreakTheExecutionFlowWhenMiddlewareDontHandleCommandWithTheNextMiddleware()
+    public function Given_ACommandBusWithHandlersAndMiddlewaresThatDontCallNextMiddleware_When_ACommandIsExecuted_Then_NoHandlerHandledIt()
     {
         // Arrange
         $this->commandMiddlewareResolverReturn = [new class() implements CommandMiddlewareInterface {
@@ -231,7 +231,7 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldThrowWhenPublishWithNoHandler()
+    public function Given_ACommandBusWithoutHandlers_When_ACommandIsPublished_Then_AnUnkowCommandExceptionIsThrow()
     {
         // Arrange
         $this->commandHandlerResolverReturn = null;
@@ -252,7 +252,7 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldHandleCommandWhenPublishACommand()
+    public function Given_ACommandBusWithHandlers_When_ACommandIsPublished_Then_MultipleHandlersHandledIt()
     {
         // Arrange
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
@@ -288,7 +288,7 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldThrowExceptionWhenAHandlerThrowAnException()
+    public function Given_ACommandBusWithHandlersThatThrowException_When_ACommandIsPublished_Then_APublishCommandExceptionIsThrow()
     {
         // Arrange
         $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
@@ -308,7 +308,7 @@ final class CommandBusTest extends TestCase
     /**
      * @test
      */
-    public function shouldNotBreakTheExecutionFlowWhenAHandlerThrowAnException()
+    public function Given_ACommandBusWithHandlersThatThrowException_When_ACommandIsPublished_Then_NextHandlerCanHandleTheCommand()
     {
         // Arrange
         $expected = new Exception(uniqid());

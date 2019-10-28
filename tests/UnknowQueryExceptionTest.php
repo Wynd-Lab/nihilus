@@ -13,7 +13,7 @@ final class UnknowQueryExceptionTest extends TestCase
     /**
      * @test
      */
-    public function shouldHaveAnExplicitMessageWhenCreateANewInstance()
+    public function Given_AQuery_When_CreateAnUnknowQueryException_Then_TheExceptionMessageContainsInformationAboutTheQuery()
     {
         // Arrange
         $query = new class() implements QueryInterface {};

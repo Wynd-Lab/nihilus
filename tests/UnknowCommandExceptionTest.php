@@ -13,7 +13,7 @@ final class UnknowCommandExceptionTest extends TestCase
     /**
      * @test
      */
-    public function shouldHaveAnExplicitMessageWhenCreateANewInstance()
+    public function Given_ACommand_When_CreateAnUnknowCommandException_Then_TheExceptionMessageContainsInformationAboutTheCommand()
     {
         // Arrange
         $command = new class() implements CommandInterface {};
