@@ -20,110 +20,25 @@ use Exception;
 final class CommandBusTest extends TestCase
 {
     /**
-     * @var CommandInterface
+     * @var CommandBusTestContext
      */
-    private $command;
+    private $context;
 
     /**
-     * @var CommandHandlerInterface
+     * @var CommandBusInterface
      */
-    private $commandHandler;
-
-    /**
-     * @var CommandHandlerResolverInterface
-     */
-    private $commandHandlerResolver;
-
-    /**
-     * @var CommandHandlerInterface
-     */
-    private $commandHandlerResolverReturn;
-
-    /**
-     * @var CommandHandlerInterface[]
-     */
-    private $commandHandlersResolverReturn;
-
-    /**
-     * @var CommandMiddlewareResolverInterface
-     */
-    private $commandMiddlewareResolver;
-
-    /**
-     * @var CommandMiddlewareInterface[]
-     */
-    private $commandMiddlewareResolverReturn;
-
-    /**
-     * @var CommandMiddlewareInterface
-     */
-    private $commandMiddleware;
+    private $commandBus;
 
     public function setUp()
     {
-        $command = new class() implements CommandInterface {
-        };
-
-        $this->command = $command;
-
-        $this->commandHandler = $this
-            ->getMockBuilder(CommandHandlerInterface::class)
-            ->setMethods(['handle'])
-            ->getMock()
-        ;
-
-        $this->commandHandlerResolver = $this
-            ->getMockBuilder(CommandHandlerResolverInterface::class)
-            ->setMethods((['get', 'getAll']))
-            ->getMock()
-        ;
-
-        $this->commandHandlerResolver
-            ->method('get')
-            ->will($this->returnCallback(
-                function () {
-                    return $this->commandHandlerResolverReturn;
-                }
-            ))
-        ;
-
-        $this->commandHandlerResolver
-            ->method('getAll')
-            ->will($this->returnCallback(
-                function () {
-                    return $this->commandHandlersResolverReturn;
-                }
-            ))
-        ;
-
-        $this->commandHandlerResolverReturn = $this->commandHandler;
-        $this->commandHandlersResolverReturn = [
-            $this->commandHandler,
-        ];
-
-        $this->commandMiddleware = $this
-            ->getMockBuilder(CommandMiddlewareInterface::class)
-            ->setMethods(['handle'])
-            ->getMock()
-        ;
-
-        $this->commandMiddlewareResolver = $this
-            ->getMockBuilder(CommandMiddlewareResolverInterface::class)
-            ->setMethods((['get']))
-            ->getMock()
-        ;
-
-        $this->commandMiddlewareResolver
-            ->method('get')
-            ->with($this->command)
-            ->will($this->returnCallback(
-                function () {
-                    return $this->commandMiddlewareResolverReturn;
-                }
-            ))
-        ;
-
-        $this->commandMiddlewareResolverReturn = [];
+        $this->context = new CommandBusTestContext($this);
+        $this->context->setUpCommand();
+        $this->context->setUpHandler();
+        $this->context->setUpMiddlewares();
+        $this->commandBus = new CommandBus(
+            $this->context->getCommandHandlerResolver(), 
+            $this->context->getCommandMiddlewareResolver()
+        );
     }
 
     /**
@@ -131,18 +46,16 @@ final class CommandBusTest extends TestCase
      */
     public function Given_ACommandBusWithHandlers_When_ACommandIsExecuted_Then_AHandlerHandledIt()
     {
-        // Arrange
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
-
         // Assert
-        $this->commandHandler
+        $this->context
+            ->getCommandHandler()
             ->expects($this->once())
             ->method('handle')
-            ->with($this->command)
+            ->with($this->context->getCommand())
         ;
 
         // Act
-        $commandBus->execute($this->command);
+        $this->commandBus->execute($this->context->getCommand());
     }
 
     /**
@@ -151,17 +64,14 @@ final class CommandBusTest extends TestCase
     public function Given_ACommandBusWithoutHandlers_When_ACommandIsExecuted_Then_AnUnkowCommandExceptionIsThrow()
     {
         // Arrange
-        $this->commandHandlerResolverReturn = null;
         $command = new class() implements CommandInterface {
         };
-
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
 
         // Assert
         $this->expectException(UnknowCommandException::class);
 
         // Act
-        $commandBus->execute($command);
+        $this->commandBus->execute($command);
     }
 
     /**
@@ -169,19 +79,16 @@ final class CommandBusTest extends TestCase
      */
     public function Given_ACommandBusWithHandlersAndMiddlewares_When_ACommandIsExecuted_Then_MiddlewaresAreExecuted()
     {
-        // Arrange
-        $this->commandMiddlewareResolverReturn = [$this->commandMiddleware];
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
-
         // Assert
-        $this->commandMiddleware
+        $this->context
+            ->getCommandMiddleware()
             ->expects($this->once())
             ->method('handle')
-            ->with($this->command)
+            ->with($this->context->getCommand())
         ;
 
         // Act
-        $commandBus->execute($this->command);
+        $this->commandBus->execute($this->context->getCommand());
     }
 
     /**
@@ -190,22 +97,22 @@ final class CommandBusTest extends TestCase
     public function Given_ACommandBusWithHandlersAndMiddlewares_When_ACommandIsExecuted_Then_AHandlerHandledIt()
     {
         // Arrange
-        $this->commandMiddlewareResolverReturn = [new class() implements CommandMiddlewareInterface {
+        $this->context->addMiddleware(new class() implements CommandMiddlewareInterface {
             public function handle(CommandInterface $command, CommandHandlerInterface $next): void
             {
                 $next->handle($command);
             }
-        }];
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
+        });
 
-        $this->commandHandler
+        $this->context
+            ->getCommandHandler()
             ->expects($this->once())
             ->method('handle')
-            ->with($this->command)
+            ->with($this->context->getCommand())
         ;
 
         // Act
-        $commandBus->execute($this->command);
+        $this->commandBus->execute($this->context->getCommand());
     }
 
     /**
@@ -214,21 +121,21 @@ final class CommandBusTest extends TestCase
     public function Given_ACommandBusWithHandlersAndMiddlewaresThatDontCallNextMiddleware_When_ACommandIsExecuted_Then_NoHandlerHandledIt()
     {
         // Arrange
-        $this->commandMiddlewareResolverReturn = [new class() implements CommandMiddlewareInterface {
+        $this->context->addMiddleware(new class() implements CommandMiddlewareInterface {
             public function handle(CommandInterface $command, CommandHandlerInterface $next): void
             {
             }
-        }];
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
-
-        $this->commandHandler
+        });
+        
+        $this->context
+            ->getCommandHandler()
             ->expects($this->never())
             ->method('handle')
-            ->with($this->command)
+            ->with($this->context->getCommand())
         ;
 
         // Act
-        $commandBus->execute($this->command);
+        $this->commandBus->execute($this->context->getCommand());
     }
 
     /**
@@ -237,19 +144,14 @@ final class CommandBusTest extends TestCase
     public function Given_ACommandBusWithoutHandlers_When_ACommandIsPublished_Then_AnUnkowCommandExceptionIsThrow()
     {
         // Arrange
-        $this->commandHandlerResolverReturn = null;
-        $this->commandHandlersResolverReturn = [];
-
         $command = new class() implements CommandInterface {
         };
-
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
 
         // Assert
         $this->expectException(UnknowCommandException::class);
 
         // Act
-        $commandBus->publish($command);
+        $this->commandBus->publish($command);
     }
 
     /**
@@ -258,34 +160,24 @@ final class CommandBusTest extends TestCase
     public function Given_ACommandBusWithHandlers_When_ACommandIsPublished_Then_MultipleHandlersHandledIt()
     {
         // Arrange
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
-
-        $mockedHandler = $this
-            ->getMockBuilder(CommandHandlerInterface::class)
-            ->setMethods(['handle'])
-            ->getMock()
-        ;
-
-        $this->commandHandlersResolverReturn = [
-            $this->commandHandler,
-            $mockedHandler,
-        ];
+        $handler = $this->context->addMockedHandler();
 
         // Assert
-        $this->commandHandler
+        $this->context
+            ->getCommandHandler()
             ->expects($this->once())
             ->method('handle')
-            ->with($this->command)
+            ->with($this->context->getCommand())
         ;
 
-        $mockedHandler
+        $handler
             ->expects($this->once())
             ->method('handle')
-            ->with($this->command)
+            ->with($this->context->getCommand())
         ;
 
         // Act
-        $commandBus->publish($this->command);
+        $this->commandBus->publish($this->context->getCommand());
     }
 
     /**
@@ -294,9 +186,8 @@ final class CommandBusTest extends TestCase
     public function Given_ACommandBusWithHandlersThatThrowException_When_ACommandIsPublished_Then_APublishCommandExceptionIsThrow()
     {
         // Arrange
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
-
-        $this->commandHandler
+        $this->context
+            ->getCommandHandler()
             ->method('handle')
             ->will($this->throwException(new Exception(uniqid())))
         ;
@@ -305,7 +196,7 @@ final class CommandBusTest extends TestCase
         $this->expectException(PublishCommandException::class);
 
         // Act
-        $commandBus->publish($this->command);
+        $this->commandBus->publish($this->context->getCommand());
     }
 
     /**
@@ -315,34 +206,26 @@ final class CommandBusTest extends TestCase
     {
         // Arrange
         $expected = new Exception(uniqid());
-        $commandBus = new CommandBus($this->commandHandlerResolver, $this->commandMiddlewareResolver);
 
-        $mockedHandler = $this
-            ->getMockBuilder(CommandHandlerInterface::class)
-            ->setMethods(['handle'])
-            ->getMock()
-        ;
+        $handler = $this->context->addMockedHandler();
 
-        $this->commandHandlersResolverReturn = [
-            $this->commandHandler,
-            $mockedHandler,
-        ];
-
-        $this->commandHandler
+        $this->context
+            ->getCommandHandler()
             ->method('handle')
+            ->with($this->context->getCommand())
             ->will($this->throwException($expected))
         ;
 
         // Assert
-        $mockedHandler
+        $handler
             ->expects($this->once())
             ->method('handle')
-            ->with($this->command)
+            ->with($this->context->getCommand())
         ;
 
         $this->expectException(PublishCommandException::class);
 
         // Act
-        $commandBus->publish($this->command);
+        $this->commandBus->publish($this->context->getCommand());
     }
 }
