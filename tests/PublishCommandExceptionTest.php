@@ -1,7 +1,10 @@
 <?php
 
+namespace Nihilus\Tests;
+
 use Nihilus\PublishCommandException;
 use PHPUnit\Framework\TestCase;
+use Exception;
 
 /**
  * @internal

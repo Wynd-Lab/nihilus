@@ -27,7 +27,7 @@
         "psr-4": { "Nihilus\\" : ["src/"] }
     },
     "autoload-dev": {
-        "psr-4": { "Nihilus\\" : ["tests/"] }
+        "psr-4": { "Nihilus\\Tests\\" : ["tests/", "tests/contexts/"] }
     },
     "require-dev": {
         "phpunit/phpunit": "^7.5",

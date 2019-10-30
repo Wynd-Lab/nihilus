@@ -1,5 +1,7 @@
 <?php
 
+namespace Nihilus\Tests;
+
 use Nihilus\QueryInterface;
 use Nihilus\UnknowQueryException;
 use PHPUnit\Framework\TestCase;

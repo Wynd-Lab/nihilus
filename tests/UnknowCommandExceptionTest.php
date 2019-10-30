@@ -1,5 +1,7 @@
 <?php
 
+namespace Nihilus\Tests;
+
 use Nihilus\CommandInterface;
 use Nihilus\UnknowCommandException;
 use PHPUnit\Framework\TestCase;

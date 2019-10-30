@@ -1,5 +1,7 @@
 <?php
 
+namespace Nihilus\Tests;
+
 use Nihilus\CommandBus;
 use Nihilus\CommandHandlerInterface;
 use Nihilus\CommandHandlerResolverInterface;
@@ -9,6 +11,7 @@ use Nihilus\CommandMiddlewareResolverInterface;
 use Nihilus\PublishCommandException;
 use Nihilus\UnknowCommandException;
 use PHPUnit\Framework\TestCase;
+use Exception;
 
 /**
  * @internal
