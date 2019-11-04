@@ -29,7 +29,7 @@ final class CommandBusTest extends TestCase
      */
     private $commandBus;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->context = new CommandBusTestContext($this);
         $this->context->setUpCommand();

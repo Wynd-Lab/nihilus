@@ -28,7 +28,7 @@ final class QueryBusTest extends TestCase
      */
     private $queryBus;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->context = new QueryBusTestContext($this);
         $this->context->setUpQueryResult();
