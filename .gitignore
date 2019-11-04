@@ -1,6 +1,7 @@
 /vendor/
 /tmp/
 .php_cs.cache
+.phpunit.result.cache
 .idea
 .vscode
 .DS_Store
