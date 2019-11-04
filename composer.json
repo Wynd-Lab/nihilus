@@ -19,7 +19,10 @@
     ],
     "scripts": {
         "test": "vendor/bin/phpunit",
-        "test:watch": "vendor/bin/phpunit-watcher watch tests/*",
+        "test:watch": [
+            "Composer\\Config::disableProcessTimeout",
+            "vendor/bin/phpunit-watcher watch tests/unit/"
+        ],
         "format": "vendor/bin/php-cs-fixer fix src",
         "lint": "vendor/bin/phpmd src text codesize,cleancode,design,naming,controversial,unusedcode"
     },
