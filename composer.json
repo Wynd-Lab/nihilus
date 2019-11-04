@@ -19,6 +19,7 @@
     ],
     "scripts": {
         "test": "vendor/bin/phpunit",
+        "test:coverage": "vendor/bin/phpunit tests --bootstrap vendor/autoload.php --coverage-html=coverrage/",
         "test:watch": [
             "Composer\\Config::disableProcessTimeout",
             "vendor/bin/phpunit-watcher watch tests/unit/"
