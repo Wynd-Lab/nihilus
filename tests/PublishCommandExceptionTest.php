@@ -8,7 +8,6 @@ use Exception;
 
 /**
  * @internal
- * @coversNothing
  */
 final class PublishCommandExceptionTest extends TestCase
 {

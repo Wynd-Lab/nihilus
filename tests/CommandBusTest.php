@@ -15,7 +15,6 @@ use Exception;
 
 /**
  * @internal
- * @coversNothing
  */
 final class CommandBusTest extends TestCase
 {
