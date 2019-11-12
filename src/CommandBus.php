@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Nihilus;
 
 use Exception;
-use sizeof;
 
 class CommandBus implements CommandBusInterface
 {
