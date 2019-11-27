@@ -6,5 +6,5 @@ namespace Nihilus;
 
 interface QueryHandlerInterface
 {
-    public function handle(QueryInterface $query): object;
+    public function handle(QueryInterface $query);
 }
