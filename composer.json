@@ -7,8 +7,24 @@
     "description": "CQRS component with 0 dependencies. Built by Wynd with PHP and ️❤️!",
     "authors": [
         {
+            "name": "Wynd",
+            "email": "support@wynd.eu"
+        },
+        {
             "name": "Sylvain Pontoreau",
             "email": "spontoreau@wynd.eu"
+        },
+        {
+            "name": "Jean Pasqualini",
+            "email": "jpasqualini@wynd.eu"
+        },
+        {
+            "name": "Thomas goalec",
+            "email": "tgoalec@wynd.eu"
+        },
+        {
+            "name": "Camille Dejoye",
+            "email": "camille.dejoye@wynd.eu"
         }
     ],
     "repositories": [
