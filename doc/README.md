@@ -36,7 +36,7 @@ use Nihilus\QueryHandlerInterface;
 
 class GetUserByIdQueryHandler implements QueryHandlerInterface
 {
-    public function handle(QueryInterface $query): object
+    public function handle(QueryInterface $query)
     {
         $userRepository = new UserRepository();
         $user = $userRepository.findById($query->getId());
@@ -161,7 +161,7 @@ use Nihilus\QueryHandlerInterface;
 
 class LoggerQueryMiddleware implements QueryMiddlewareInterface
 {
-    public function handle(QueryInterface $query, QueryHandlerInterface $next): object
+    public function handle(QueryInterface $query, QueryHandlerInterface $next)
     {
         var_dump("Query: {$query}");
         $result = $next->handle($query);
