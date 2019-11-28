@@ -28,6 +28,12 @@ steps:
 - script: composer lint
   displayName: 'composer lint'
 
+- script: php examples/command-test.php
+  displayName: 'example command test'
+
+- script: php examples/query-test.php
+  displayName: 'example query test'
+
 - script: composer test
   displayName: 'composer test'
 

@@ -32,14 +32,14 @@ class QueryMiddlewareDispatcher
                 $this->next = $next;
             }
 
-            public function handle(QueryInterface $query): object
+            public function handle(QueryInterface $query)
             {
                 return $this->queryMiddleware->handle($query, $this->next);
             }
         };
     }
 
-    public function handle(QueryInterface $query): object
+    public function handle(QueryInterface $query)
     {
         return $this->queryHandler->handle($query);
     }

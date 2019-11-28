@@ -19,30 +19,25 @@ class TQuery implements QueryInterface
 
 class TestHandler implements QueryHandlerInterface
 {
-    public function handle(QueryInterface $query): object
+    public function handle(QueryInterface $query)
     {
-        return new class() {
-            public $property = 'property';
-        };
+        return ['data'];
     }
 }
 
 class Test1Middleware implements QueryMiddlewareInterface
 {
-    public function handle(QueryInterface $query, QueryHandlerInterface $next): object
+    public function handle(QueryInterface $query, QueryHandlerInterface $next)
     {
         var_dump('Return another object lol');
 
-        //return $next->handle($query);
-        return new class() {
-            public $test = 'lol';
-        };
+        return $next->handle($query);
     }
 }
 
 class Test2Middleware implements QueryMiddlewareInterface
 {
-    public function handle(QueryInterface $query, QueryHandlerInterface $next): object
+    public function handle(QueryInterface $query, QueryHandlerInterface $next)
     {
         var_dump('Before 2');
         $r = $next->handle($query);
@@ -54,7 +49,7 @@ class Test2Middleware implements QueryMiddlewareInterface
 
 class Test3Middleware implements QueryMiddlewareInterface
 {
-    public function handle(QueryInterface $query, QueryHandlerInterface $next): object
+    public function handle(QueryInterface $query, QueryHandlerInterface $next)
     {
         var_dump('Before 3');
         $r = $next->handle($query);
