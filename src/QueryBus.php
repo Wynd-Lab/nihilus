@@ -22,7 +22,7 @@ class QueryBus implements QueryBusInterface
         $this->middlewareResolver = $middlewareResolver;
     }
 
-    public function execute(QueryInterface $query): object
+    public function execute(QueryInterface $query)
     {
         $queryHandler = $this->handlerResolver->get($query);
 
